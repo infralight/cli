@@ -51,7 +51,7 @@ func (m *EnvsTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case spinner.TickMsg:
 		_, cmd = m.loading.Update(msg)
 		return m, cmd
-	case statusMsg:
+	case successMsg:
 		return m, nil
 	case errMsg:
 		m.err = msg
@@ -101,5 +101,5 @@ func (m *EnvsTab) loadEnvs() tea.Msg {
 
 	m.isLoading = false
 
-	return statusMsg(200)
+	return successMsg("success")
 }

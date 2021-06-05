@@ -45,7 +45,7 @@ func (m *Model) Init() tea.Cmd {
 
 func (m *Model) Update(msg tea.Msg) (model tea.Model, cmd tea.Cmd) {
 	keyMsg, ok := msg.(tea.KeyMsg)
-	if ok && oneOf(keyMsg.String(), KeyCtrlC, KeyQ) {
+	if ok && keyMsg.String() == KeyCtrlC {
 		return m, tea.Quit
 	}
 
@@ -112,14 +112,4 @@ func max(a, b int) int {
 		return a
 	}
 	return b
-}
-
-func oneOf(str string, opts ...string) bool {
-	for _, opt := range opts {
-		if str == opt {
-			return true
-		}
-	}
-
-	return false
 }

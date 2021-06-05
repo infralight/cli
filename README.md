@@ -8,8 +8,9 @@
 * [Features](#features)
 * [Installation](#installation)
 * [Quick Start](#quick-start)
-    * [Example 1: Start the TUI](#example-1-start-the-tui)
-    * [Example 2: List Available Environments](#example-2-list-available-environments)
+    * [Example 1: Create a Configuration Profile](#example-1-create-a-configuration-profile)
+    * [Example 2: Start the TUI](#example-2-start-the-tui)
+    * [Example 3: List Available Environments](#example-3-list-available-environments)
 * [Development](#development)
     * [Requirements](#requirements)
     * [Unit Tests and Static Code Analysis](#unit-tests-and-static-code-analysis)
@@ -57,25 +58,42 @@ sudo install -Dm755 infralight /usr/local/bin/infralight
 infralight --help
 ```
 
-You must provide an access key and secret key for the CLI to authenticate with
-the Infralight API. Create a keypair through the Infralight dashboard.
+The CLI needs an access and secret key-pair to authenticate with the Infralight
+API server. A keypair must be created through the Infralight dashboard.
 
-The keypair can be provided via the `--access-key` and `--secret-key` command
-line options. If not provided, the user will be prompted to enter them before
-the CLI continues.
+Multiple profiles can be created, each with its own key-pair and a few more
+optional settings, such as the ability to override the API URL and name of the
+Authorization header (useful when organizational access to Infralight is behind
+a reverse proxy). The default profile is called "default". Select a profile by
+using the `--profile` or `-p` command line flag.
 
-By default, the CLI will authenticate with Infralight's production API server.
-To use a different server, provide the `--url` option.
+Alternatively, a key-pair can be provided via the `--access-key` and `--secret-key`
+flags. If no profile has been created (or selected), and a key-pair has not
+been provided, the user will be prompted to enter the key-pair before the CLI
+initializes.
+
+The default API URL and Authorization header can also be modified via the
+`--url` and `--auth-header` flags, respectively.
 
 If no command is provided, the program will start the Terminal User Interface.
 
-### Example 1: Start the TUI
+### Example 1: Create a Configuration Profile
+
+```sh
+infralight configure
+```
+
+Fill in the required information, including a name for the profile and the
+access/secret key-pair. A TOML configuration file will be created in the user's
+[$XDG_CONFIG_HOME](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) directory.
+
+### Example 2: Start the TUI
 
 ```sh
 infralight
 ```
 
-### Example 2: List Available Environments
+### Example 3: List Available Environments
 
 ```sh
 infralight envs list

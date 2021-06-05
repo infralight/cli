@@ -10,7 +10,7 @@ import (
 	"github.com/infralight/cli/client"
 )
 
-type statusMsg int
+type successMsg string
 
 type errMsg struct{ err error }
 
@@ -55,7 +55,6 @@ func NewSignIn(c *client.Client, accessKey, secretKey string) *SignInModel {
 
 	return &SignInModel{
 		c:            c,
-		index:        0,
 		inputs:       []textinput.Model{accessKeyInput, secretKeyInput},
 		submitButton: blurredSubmitButton,
 		loading:      loading,
@@ -128,7 +127,7 @@ func (m *SignInModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			return m, nil
 		}
-	case statusMsg:
+	case successMsg:
 		return m, nil
 	case errMsg:
 		m.err = msg
@@ -175,5 +174,5 @@ func (m *SignInModel) signIn() tea.Msg {
 	m.isLoading = false
 	m.isSignedIn = true
 
-	return statusMsg(200)
+	return successMsg("success")
 }
