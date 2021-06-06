@@ -5,9 +5,11 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ido50/requests"
@@ -132,6 +134,10 @@ type Drift struct {
 	Modified  int64  `json:"modifiedCount"`
 }
 
+func (d Drift) CreationDate() time.Time {
+	return time.Unix(d.CreatedAt, 0)
+}
+
 type AssetState string
 
 const (
@@ -163,14 +169,20 @@ func (c *Client) ListDrifts(onlyDelta bool, limit uint64) (list []Drift, err err
 }
 
 func (c *Client) ShowDrift(driftID string) (list []Asset, err error) {
-	err = c.httpc.NewRequest("GET", fmt.Sprintf("/drifts/%s", driftID)).
+	err = c.httpc.NewRequest(
+		"GET",
+		fmt.Sprintf("/drifts/%s", strings.TrimPrefix(driftID, "Drifts/")),
+	).
 		Into(&list).
 		Run()
 	return list, err
 }
 
 func (c *Client) ShowAsset(assetID string) (list []Asset, err error) {
-	err = c.httpc.NewRequest("GET", fmt.Sprintf("/drifts/asset/%s", assetID)).
+	err = c.httpc.NewRequest(
+		"GET",
+		fmt.Sprintf("/drifts/asset/%s", url.PathEscape(assetID)),
+	).
 		Into(&list).
 		Run()
 	return list, err

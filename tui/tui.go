@@ -26,17 +26,24 @@ func Start(c *client.Client, accessKey, secretKey string) error {
 
 	homeTab := NewHomeTab(c, width)
 
-	p := tea.NewProgram(&Model{
-		width:  width,
-		signIn: NewSignIn(c, accessKey, secretKey),
-		tabs: []Tab{
-			homeTab,
-			NewEnvsTab(c, width),
-			NewDriftsTab(c, width),
+	return tea.NewProgram(
+		&Model{
+			width:  width,
+			signIn: NewSignIn(c, accessKey, secretKey),
+			tabs: []Tab{
+				homeTab,
+				NewEnvsTab(c, width),
+				NewDriftsTab(c, width),
+			},
+			activeTab: homeTab,
 		},
-		activeTab: homeTab,
-	})
-	return p.Start()
+
+		// Use the full size of the terminal in its "alternate screen buffer"
+		tea.WithAltScreen(),
+
+		// Also turn on mouse support so we can track the mouse wheel
+		tea.WithMouseCellMotion(),
+	).Start()
 }
 
 func (m *Model) Init() tea.Cmd {
@@ -44,27 +51,35 @@ func (m *Model) Init() tea.Cmd {
 }
 
 func (m *Model) Update(msg tea.Msg) (model tea.Model, cmd tea.Cmd) {
-	keyMsg, ok := msg.(tea.KeyMsg)
-	if ok && keyMsg.String() == KeyCtrlC {
-		return m, tea.Quit
-	}
-
 	if !m.signIn.isSignedIn {
 		_, cmd = m.signIn.Update(msg)
 		return m, cmd
 	}
 
-	// did the user ask to switch tabs?
-	if ok {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		if msg.String() == KeyCtrlC {
+			return m, tea.Quit
+		}
+
+		// did the user ask to switch tabs?
 		for _, tab := range m.tabs {
-			if tab.Key() == keyMsg.String() {
+			if tab.Key() == msg.String() {
 				m.activeTab = tab
 				return m, tab.Init()
 			}
 		}
+
+		_, cmd = m.activeTab.Update(msg)
+	case tea.WindowSizeMsg:
+		// pass this message to all tabs
+		for _, tab := range m.tabs {
+			_, cmd = tab.Update(msg)
+		}
+	default:
+		_, cmd = m.activeTab.Update(msg)
 	}
 
-	_, cmd = m.activeTab.Update(msg)
 	return m, cmd
 }
 

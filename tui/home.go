@@ -16,23 +16,28 @@ var (
 )
 
 type HomeTab struct {
-	width int
+	width  int
+	height int
 }
 
 func NewHomeTab(_ *client.Client, width int) *HomeTab {
-	return &HomeTab{width}
+	return &HomeTab{width: width}
 }
 
-func (home *HomeTab) Key() string                 { return "0" }
-func (home *HomeTab) Name() string                { return "Infralight" }
-func (home *HomeTab) NormalStyle() lipgloss.Style { return homeTabStyle }
-func (home *HomeTab) ActiveStyle() lipgloss.Style { return homeTabStyle }
+func (m *HomeTab) Key() string                 { return "0" }
+func (m *HomeTab) Name() string                { return "Infralight" }
+func (m *HomeTab) NormalStyle() lipgloss.Style { return homeTabStyle }
+func (m *HomeTab) ActiveStyle() lipgloss.Style { return homeTabStyle }
 
-func (home *HomeTab) Init() tea.Cmd {
+func (m *HomeTab) Init() tea.Cmd {
 	return nil
 }
 
 func (m *HomeTab) Update(msg tea.Msg) (model tea.Model, cmd tea.Cmd) {
+	if size, ok := msg.(tea.WindowSizeMsg); ok {
+		m.width = size.Width
+		m.height = size.Height - 6
+	}
 	return m, nil
 }
 
@@ -41,13 +46,13 @@ func (m *HomeTab) View() string {
 		"%s\n\n",
 		lipgloss.Place(
 			m.width,
-			15,
+			m.height,
 			lipgloss.Center,
 			lipgloss.Center,
 			lipgloss.
 				NewStyle().
 				Width(50).
-				Height(2).
+				Height(3).
 				Align(lipgloss.Center).
 				Render(`Welcome to the Infralight CLI!
 Select a tab from the above menu by

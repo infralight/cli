@@ -25,6 +25,10 @@ func NewChooser(title string, choices []Choice) *ChooserModel {
 	}
 }
 
+func (m *ChooserModel) CurrentChoice() Choice {
+	return m.choices[m.cursor]
+}
+
 func (m *ChooserModel) Init() tea.Cmd {
 	return nil
 }

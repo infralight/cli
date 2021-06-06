@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"net/url"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -57,7 +56,7 @@ var driftsAssetCmd = &cobra.Command{
 	Args:          cobra.ExactArgs(1),
 	SilenceErrors: true,
 	RunE: func(_ *cobra.Command, args []string) error {
-		asset, err := c.ShowAsset(url.PathEscape(args[0]))
+		asset, err := c.ShowAsset(args[0])
 		if err != nil {
 			return fmt.Errorf("failed showing asset %s: %w", args[0], err)
 		}
