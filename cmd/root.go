@@ -12,14 +12,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var profile, authHeader, url, accessKey, secretKey string
+var profile, authHeader, apiURL, accessKey, secretKey string
 var c *client.Client
 var prettyPrint bool
 
 var rootCmd = &cobra.Command{
 	Use:   "infralight",
 	Short: "Command line interface for the Infralight SaaS",
-	PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
+	PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 		if accessKey == "" || secretKey == "" {
 			// keypair not provided via command line flags, try to load a
 			// configuration file. If this fails, only exit if user supplied a
@@ -34,15 +34,22 @@ var rootCmd = &cobra.Command{
 
 			accessKey = conf.AccessKey
 			secretKey = conf.SecretKey
-			url = conf.URL
+			apiURL = conf.URL
 			authHeader = conf.AuthorizationHeader
 		}
 
-		c = client.New(url, authHeader)
+		c = client.New(apiURL, authHeader)
 
 		if accessKey == "" && secretKey == "" {
-			return nil
+			if cmd.Name() == "infralight" {
+				// the TUI does not require a key-pair
+				return nil
+			}
+
+			return errors.New("access and secret key must be provided")
 		}
+
+		fmt.Fprintf(os.Stderr, "Using profile %q against %q...\n\n", profile, apiURL)
 
 		return c.Authenticate(accessKey, secretKey)
 	},
@@ -74,7 +81,7 @@ func init() {
 		"Secret key (will be prompted for if not provided)",
 	)
 	rootCmd.PersistentFlags().StringVar(
-		&url,
+		&apiURL,
 		"url",
 		client.DefaultInfralightURL,
 		"Infralight API URL",

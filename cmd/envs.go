@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +20,7 @@ var envsListCmd = &cobra.Command{
 	RunE: func(_ *cobra.Command, _ []string) error {
 		list, err := c.ListStacks()
 		if err != nil {
-			return err
+			return fmt.Errorf("failed listing environments")
 		}
 
 		return render(list)
