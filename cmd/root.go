@@ -20,6 +20,10 @@ var rootCmd = &cobra.Command{
 	Use:   "infralight",
 	Short: "Command line interface for the Infralight SaaS",
 	PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+		if cmd.Name() == "configure" {
+			return nil
+		}
+
 		if accessKey == "" || secretKey == "" {
 			// keypair not provided via command line flags, try to load a
 			// configuration file. If this fails, only exit if user supplied a
