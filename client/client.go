@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -37,7 +38,19 @@ func New(url, authHeader string) *Client {
 
 	return &Client{
 		authHeader: authHeader,
-		httpc:      requests.NewClient(url).Accept("application/json"),
+		httpc: requests.NewClient(url).
+			Accept("application/json").
+			ErrorHandler(func(status int, _ string, body io.Reader) error {
+				var errMap map[string]string
+				err := json.NewDecoder(body).Decode(&errMap)
+				if err == nil {
+					if msg, ok := errMap["message"]; ok {
+						return errors.New(msg)
+					}
+				}
+
+				return fmt.Errorf("server returned unexpected status %d", status)
+			}),
 	}
 }
 
@@ -213,4 +226,55 @@ func (c *Client) ShowAsset(assetID string) (list []Asset, err error) {
 		Into(&list).
 		Run()
 	return list, err
+}
+
+type State struct {
+	ID        string          `json:"id"`
+	StackID   string          `json:"stackId"`
+	CreatedAt time.Time       `json:"createdAt,omitempty"`
+	Policy    json.RawMessage `json:"policy"`
+	RunID     string          `json:"runId,omitempty"`
+}
+
+func (c *Client) ListStates(stackID string) (list []State, err error) {
+	err = c.httpc.NewRequest(
+		"GET",
+		fmt.Sprintf("/states/stack/%s", url.PathEscape(stackID)),
+	).
+		Into(&list).
+		Run()
+	return list, err
+}
+
+func (c *Client) GetLatestState(stackID string) (list State, err error) {
+	err = c.httpc.NewRequest(
+		"GET",
+		fmt.Sprintf("/states/stack/%s/latest", url.PathEscape(stackID)),
+	).
+		Into(&list).
+		Run()
+	return list, err
+}
+
+func (c *Client) UploadStatePolicy(
+	stackID string,
+	tfState, policy json.RawMessage,
+) (err error) {
+	var jsonPolicy map[string]interface{}
+	err = json.Unmarshal(policy, &jsonPolicy)
+	if err != nil {
+		return fmt.Errorf("failed decoding policy: %w", err)
+	}
+
+	err = c.httpc.NewRequest(
+		"POST",
+		fmt.Sprintf("/states/stack/%s/upload", url.PathEscape(stackID)),
+	).
+		JSONBody(map[string]interface{}{
+			"tfState": string(tfState),
+			"policy":  jsonPolicy,
+		}).
+		ExpectedStatus(http.StatusNoContent).
+		Run()
+	return err
 }
