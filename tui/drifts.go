@@ -20,7 +20,9 @@ type DriftsTab struct {
 	drifts       []client.Drift
 	assets       []client.Asset
 	chooser      *ChooserModel
+	code         string
 	currentDrift string
+	assetCursor  int
 	err          error
 	vp           viewport.Model
 	ready        bool
@@ -66,9 +68,56 @@ func (m *DriftsTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.currentDrift == "" {
 				return m, tea.Batch(spinner.Tick, m.showDrift)
 			}
+
+			return m, tea.Batch(spinner.Tick, m.codify)
 		case KeyEsc, KeyBackspace:
-			m.currentDrift = ""
+			m.err = nil
+			m.isLoading = false
+			if m.code != "" {
+				m.code = ""
+			} else {
+				m.currentDrift = ""
+			}
 			return m, nil
+		case "up", "k":
+			if m.currentDrift != "" && m.assetCursor > 0 {
+				m.assetCursor--
+				m.vp.SetContent(m.assetList())
+
+				if m.vp.YOffset > 0 && m.assetCursor-m.vp.Height-1 > int(0.1*float64(m.vp.Height)) {
+					return m, nil
+				}
+			}
+		case "pgup", "b":
+			if m.currentDrift != "" && m.assetCursor > 0 {
+				if m.assetCursor >= m.vp.Height {
+					m.assetCursor -= m.vp.Height
+				} else {
+					m.assetCursor = 0
+				}
+
+				m.vp.SetContent(m.assetList())
+
+				if m.vp.YOffset > 0 && m.assetCursor-m.vp.Height-1 > int(0.1*float64(m.vp.Height)) {
+					return m, nil
+				}
+			}
+		case "down", "j":
+			if m.currentDrift != "" && m.assetCursor < len(m.assets)-1 {
+				m.assetCursor++
+				m.vp.SetContent(m.assetList())
+				if m.assetCursor < int(0.9*float64(m.vp.Height)) {
+					return m, nil
+				}
+			}
+		case "pgdown", " ", "f":
+			if m.currentDrift != "" && m.assetCursor < len(m.assets)-1 {
+				m.assetCursor += m.vp.Height
+				m.vp.SetContent(m.assetList())
+				if m.assetCursor < int(0.9*float64(m.vp.Height)) {
+					return m, nil
+				}
+			}
 		}
 	case tea.WindowSizeMsg:
 		verticalMargins := headerHeight + footerHeight
@@ -88,7 +137,7 @@ func (m *DriftsTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case errMsg:
 		m.err = msg
-		return m, tea.Quit
+		return m, nil
 	}
 
 	if m.currentDrift == "" {
@@ -109,6 +158,10 @@ func (m *DriftsTab) View() string {
 	case m.isLoading:
 		fmt.Fprintf(&b, "%s Loading...\n\n", m.loading.View())
 	case m.currentDrift != "":
+		if m.code != "" {
+			m.vp.SetContent(m.code)
+		}
+
 		style := lipgloss.NewStyle().
 			BorderStyle(lipgloss.NormalBorder()).
 			BorderForeground(lipgloss.Color("#fff")).
@@ -152,6 +205,7 @@ func (m *DriftsTab) loadDrifts() tea.Msg {
 
 func (m *DriftsTab) showDrift() tea.Msg {
 	m.isLoading = true
+	m.assetCursor = 0
 
 	var err error
 	m.assets, err = m.c.ShowDrift(m.chooser.CurrentChoice().ID)
@@ -183,11 +237,16 @@ var (
 	modifiedStyle = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color("#ffb300"))
+
+	highlightedStyle = lipgloss.NewStyle().
+				Bold(true).
+				Background(purpleColor).
+				Foreground(whiteColor)
 )
 
 func (m *DriftsTab) assetList() string {
 	var b strings.Builder
-	for _, asset := range m.assets {
+	for i, asset := range m.assets {
 		assetStyle := managedStyle
 		switch asset.State {
 		case client.StateModified:
@@ -196,14 +255,43 @@ func (m *DriftsTab) assetList() string {
 			assetStyle = unmanagedStyle
 		}
 
-		fmt.Fprintf(
-			&b,
-			"%s %s %s\n",
-			typeStyle.Render(lipgloss.PlaceHorizontal(20, lipgloss.Center, asset.Type)),
-			lipgloss.PlaceHorizontal(m.vp.Width-38, lipgloss.Left, asset.ID),
-			assetStyle.Render(lipgloss.PlaceHorizontal(11, lipgloss.Center, string(asset.State))),
-		)
+		if i == m.assetCursor {
+			line := fmt.Sprintf(
+				"%s %s %s",
+				lipgloss.PlaceHorizontal(30, lipgloss.Center, asset.Type),
+				lipgloss.PlaceHorizontal(m.vp.Width-41-8, lipgloss.Left, asset.ID),
+				lipgloss.PlaceHorizontal(11, lipgloss.Center, string(asset.State)),
+			)
+
+			fmt.Fprintln(&b, highlightedStyle.Render(line))
+		} else {
+			fmt.Fprintf(
+				&b,
+				"%s %s %s\n",
+				typeStyle.Render(lipgloss.PlaceHorizontal(30, lipgloss.Center, asset.Type)),
+				lipgloss.PlaceHorizontal(m.vp.Width-41-8, lipgloss.Left, asset.ID),
+				assetStyle.Render(lipgloss.PlaceHorizontal(11, lipgloss.Center, string(asset.State))),
+			)
+		}
 	}
 
 	return b.String()
+}
+
+func (m *DriftsTab) codify() tea.Msg {
+	m.isLoading = true
+
+	asset := m.assets[m.assetCursor]
+
+	var err error
+	m.code, err = m.c.Codify(asset.Type, asset.ID)
+	if err != nil {
+		m.code = "error"
+		return errMsg{err}
+	}
+
+	m.loading.Finish()
+	m.isLoading = false
+
+	return successMsg("success")
 }

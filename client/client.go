@@ -129,10 +129,23 @@ func (c *Client) Codify(assetType, assetID string) (output string, err error) {
 				return err
 			}
 
+			if len(b) == 0 {
+				return errors.New("no content received from server")
+			}
+
 			v := target.(*string)
 			*v, err = strconv.Unquote(string(b))
+			if err != nil {
+				*v = string(b)
+				return nil
+			}
+
 			*v, err = strconv.Unquote(*v)
-			return err
+			if err != nil {
+				*v = string(b)
+			}
+
+			return nil
 		}).
 		Into(&output).
 		Run()
