@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -114,11 +115,22 @@ func (c *Client) ListStacks() (list []Stack, err error) {
 	return list, err
 }
 
-func (c *Client) Codify(assetType, assetID string) (output interface{}, err error) {
+func (c *Client) Codify(assetType, assetID string) (output string, err error) {
 	err = c.httpc.NewRequest("POST", "/reverseLearning").
 		JSONBody(map[string]string{
 			"assetType": assetType,
 			"assetId":   assetID,
+		}).
+		BodyHandler(func(_ int, contentType string, body io.Reader, target interface{}) error {
+			b, err := io.ReadAll(body)
+			if err != nil {
+				return err
+			}
+
+			v := target.(*string)
+			*v, err = strconv.Unquote(string(b))
+			*v, err = strconv.Unquote(*v)
+			return err
 		}).
 		Into(&output).
 		Run()

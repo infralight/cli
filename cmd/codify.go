@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +17,8 @@ var codifyCmd = &cobra.Command{
 			return err
 		}
 
-		return render(output)
+		_, err = fmt.Fprintln(os.Stdout, output)
+		return err
 	},
 }
 
