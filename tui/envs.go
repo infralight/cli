@@ -13,7 +13,7 @@ import (
 type EnvsTab struct {
 	isLoading  bool
 	loading    spinner.Model
-	envs       []client.Stack
+	envs       []client.Environment
 	chooser    *ChooserModel
 	currentEnv int
 	err        error
@@ -82,7 +82,7 @@ func (m *EnvsTab) View() string {
 
 func (m *EnvsTab) loadEnvs() tea.Msg {
 	var err error
-	m.envs, err = m.c.ListStacks()
+	m.envs, err = m.c.ListEnvironments()
 	if err != nil {
 		return errMsg{err}
 	}

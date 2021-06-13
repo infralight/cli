@@ -118,16 +118,43 @@ func (c *Client) saveCachedToken(accessKey, token string) error {
 	return os.WriteFile(c.cacheName(accessKey), []byte(token), 0600)
 }
 
+type Environment struct {
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Owner string `json:"owner,omitempty"`
+}
+
+func (c *Client) ListEnvironments() (list []Environment, err error) {
+	err = c.httpc.NewRequest("GET", "/environments").
+		Into(&list).
+		Run()
+	return list, err
+}
+
 type Stack struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
-func (c *Client) ListStacks() (list []Stack, err error) {
-	err = c.httpc.NewRequest("GET", "/stacks").
+func (c *Client) ListStacks(envID string) (list []Stack, err error) {
+	err = c.httpc.NewRequest("GET", fmt.Sprintf("/environments/%s/stack/", envID)).
 		Into(&list).
 		Run()
 	return list, err
+}
+
+func (c *Client) GetStack(envID, stackID string) (stack map[string]interface{}, err error) {
+	err = c.httpc.NewRequest("GET", fmt.Sprintf("/environments/%s/stack/%s", envID, stackID)).
+		Into(&stack).
+		Run()
+	return stack, err
+}
+
+func (c *Client) DeleteStack(envID, stackID string) (stack map[string]interface{}, err error) {
+	err = c.httpc.NewRequest("DELETE", fmt.Sprintf("/environments/%s/stack/%s", envID, stackID)).
+		Into(&stack).
+		Run()
+	return stack, err
 }
 
 func (c *Client) Codify(assetType, assetID string) (output string, err error) {

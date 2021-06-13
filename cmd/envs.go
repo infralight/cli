@@ -18,7 +18,7 @@ var envsListCmd = &cobra.Command{
 	Args:          cobra.NoArgs,
 	SilenceErrors: true,
 	RunE: func(_ *cobra.Command, _ []string) error {
-		list, err := c.ListStacks()
+		list, err := c.ListEnvironments()
 		if err != nil {
 			return fmt.Errorf("failed listing environments")
 		}
