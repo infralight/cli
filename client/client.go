@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/url"
@@ -42,7 +43,7 @@ func New(url, authHeader string) *Client {
 
 func (c *Client) Authenticate(accessKey, secretKey string) error {
 	// check if we have an authentication token already stored in the
-	// temporary directory. Files must only be valid for 3 minutes, after
+	// temporary directory. Files must only be valid for 5 minutes, after
 	// which they should be removed and recreated.
 	err := c.getCachedToken(accessKey)
 	if err == nil {
@@ -83,9 +84,10 @@ func (c *Client) getCachedToken(accessKey string) error {
 		return err
 	}
 
-	if time.Since(stat.ModTime()) > 3*time.Minute {
+	if time.Since(stat.ModTime()) > 5*time.Minute {
 		// file too old, remove it
-		return os.Remove(path)
+		os.Remove(path) // nolint: errcheck
+		return errors.New("cached token too old")
 	}
 
 	token, err := os.ReadFile(path)
