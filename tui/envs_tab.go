@@ -13,25 +13,24 @@ import (
 type EnvsTab struct {
 	isLoading  bool
 	loading    spinner.Model
-	envs       []client.Environment
-	chooser    *ChooserModel
-	currentEnv int
+	chooser    *ChooserViewport
+	currentEnv client.Environment
 	err        error
 	c          *client.Client
 	width      int
+	height     int
+	ready      bool
 }
 
-func NewEnvsTab(c *client.Client, width int) *EnvsTab {
+func NewEnvsTab(c *client.Client) *EnvsTab {
 	loading := spinner.NewModel()
 	loading.Spinner = spinner.Dot
 	loading.Style = purpleText
 
 	return &EnvsTab{
-		c:          c,
-		width:      width,
-		loading:    loading,
-		isLoading:  true,
-		currentEnv: -1,
+		c:         c,
+		loading:   loading,
+		isLoading: true,
 	}
 }
 
@@ -51,6 +50,10 @@ func (m *EnvsTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case spinner.TickMsg:
 		_, cmd = m.loading.Update(msg)
 		return m, cmd
+	case tea.WindowSizeMsg:
+		m.width = msg.Width
+		m.height = msg.Height - verticalMargins
+		m.ready = true
 	case successMsg:
 		return m, nil
 	case errMsg:
@@ -58,7 +61,7 @@ func (m *EnvsTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Quit
 	}
 
-	if m.currentEnv == -1 {
+	if m.chooser != nil {
 		_, cmd = m.chooser.Update(msg)
 	}
 
@@ -66,6 +69,10 @@ func (m *EnvsTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *EnvsTab) View() string {
+	if !m.ready {
+		return "\n  Initializing..."
+	}
+
 	var b strings.Builder
 
 	switch {
@@ -81,24 +88,24 @@ func (m *EnvsTab) View() string {
 }
 
 func (m *EnvsTab) loadEnvs() tea.Msg {
-	var err error
-	m.envs, err = m.c.ListEnvironments()
+	m.isLoading = true
+
+	envs, err := m.c.ListEnvironments()
 	if err != nil {
 		return errMsg{err}
 	}
 
-	if len(m.envs) > 0 {
-		envChoices := make([]Choice, len(m.envs))
-		for i, env := range m.envs {
-			envChoices[i] = Choice{
-				ID:   env.ID,
-				Name: env.Name,
-			}
+	choices := make([]Choice, len(envs))
+	for i, env := range envs {
+		choices[i] = Choice{
+			Object:        env,
+			Display:       env.Name,
+			ChosenDisplay: highlightedStyle.Render(env.Name),
 		}
-
-		m.chooser = NewChooser("Available Environments:", envChoices)
 	}
 
+	m.chooser = NewChooserViewport(choices, m.width, m.height)
+	m.loading.Finish()
 	m.isLoading = false
 
 	return successMsg("success")

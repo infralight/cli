@@ -12,30 +12,30 @@ import (
 )
 
 type Model struct {
-	width     int
 	signIn    *SignInModel
 	tabs      []Tab
 	activeTab Tab
+	ready     bool
+	width     int
+	height    int
 }
 
 func Start(c *client.Client, accessKey, secretKey string) error {
-	width, _, err := term.GetSize(int(os.Stdout.Fd()))
-	if err != nil {
-		width = 80
-	}
+	homeTab := NewHomeTab(c)
 
-	homeTab := NewHomeTab(c, width)
+	width, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
 	return tea.NewProgram(
 		&Model{
-			width:  width,
 			signIn: NewSignIn(c, accessKey, secretKey),
 			tabs: []Tab{
 				homeTab,
-				NewEnvsTab(c, width),
-				NewDriftsTab(c, width),
+				NewEnvsTab(c),
+				NewDriftsTab(c),
 			},
 			activeTab: homeTab,
+			width:     width,
+			height:    height,
 		},
 
 		// Use the full size of the terminal in its "alternate screen buffer"
@@ -51,6 +51,16 @@ func (m *Model) Init() tea.Cmd {
 }
 
 func (m *Model) Update(msg tea.Msg) (model tea.Model, cmd tea.Cmd) {
+	if msg, ok := msg.(tea.WindowSizeMsg); ok {
+		m.width = msg.Width
+		m.height = msg.Height
+		m.ready = true
+		// pass this message to all tabs
+		for _, tab := range m.tabs {
+			tab.Update(msg)
+		}
+	}
+
 	if !m.signIn.isSignedIn {
 		_, cmd = m.signIn.Update(msg)
 		return m, cmd
@@ -71,11 +81,6 @@ func (m *Model) Update(msg tea.Msg) (model tea.Model, cmd tea.Cmd) {
 		}
 
 		_, cmd = m.activeTab.Update(msg)
-	case tea.WindowSizeMsg:
-		// pass this message to all tabs
-		for _, tab := range m.tabs {
-			_, cmd = tab.Update(msg)
-		}
 	default:
 		_, cmd = m.activeTab.Update(msg)
 	}
@@ -84,6 +89,10 @@ func (m *Model) Update(msg tea.Msg) (model tea.Model, cmd tea.Cmd) {
 }
 
 func (m *Model) View() string {
+	if !m.ready {
+		return "\n  Initializing..."
+	}
+
 	var b strings.Builder
 
 	if !m.signIn.isSignedIn {

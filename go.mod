@@ -12,6 +12,7 @@ require (
 	github.com/coreos/go-etcd v2.0.0+incompatible // indirect
 	github.com/cpuguy83/go-md2man v1.0.10 // indirect
 	github.com/ido50/requests v1.2.0 // indirect
+	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.0-beta.3 // indirect
 	github.com/spf13/cobra v1.1.3 // indirect
 	github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8 // indirect

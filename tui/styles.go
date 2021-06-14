@@ -4,6 +4,13 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+const (
+	headerHeight      = 5
+	footerHeight      = 2
+	verticalMargins   = headerHeight + footerHeight
+	horizontalMargins = 8
+)
+
 var (
 	purpleColor = lipgloss.Color("#a200ff")
 	whiteColor  = lipgloss.Color("#fff")
@@ -22,4 +29,9 @@ var (
 
 	focusedSubmitButton = "[ " + purpleText.Render("Submit") + " ]"
 	blurredSubmitButton = "[ " + greyText.Render("Submit") + " ]"
+
+	highlightedStyle = lipgloss.NewStyle().
+				Bold(true).
+				Background(purpleColor).
+				Foreground(whiteColor)
 )

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -44,9 +45,9 @@ var statesLatestCmd = &cobra.Command{
 }
 
 var statesUploadCmd = &cobra.Command{
-	Use:           "upload <stack> <tf_state.json> <policy.json>",
-	Short:         "Upload a Policy for a State",
-	Args:          cobra.ExactArgs(3),
+	Use:           "upload <stack> <tf_state.json> [policy.json]",
+	Short:         "Upload a State File",
+	Args:          cobra.MinimumNArgs(2),
 	SilenceErrors: true,
 	RunE: func(_ *cobra.Command, args []string) error {
 		tfState, err := os.ReadFile(args[1])
@@ -54,9 +55,12 @@ var statesUploadCmd = &cobra.Command{
 			return fmt.Errorf("failed reading %s: %w", args[1], err)
 		}
 
-		policy, err := os.ReadFile(args[2])
-		if err != nil {
-			return fmt.Errorf("failed reading %s: %w", args[2], err)
+		var policy json.RawMessage
+		if len(args) > 2 {
+			policy, err = os.ReadFile(args[2])
+			if err != nil {
+				return fmt.Errorf("failed reading %s: %w", args[2], err)
+			}
 		}
 
 		err = c.UploadStatePolicy(args[0], tfState, policy)

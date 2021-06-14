@@ -41,15 +41,22 @@ func New(url, authHeader string) *Client {
 		httpc: requests.NewClient(url).
 			Accept("application/json").
 			ErrorHandler(func(status int, _ string, body io.Reader) error {
-				var errMap map[string]string
-				err := json.NewDecoder(body).Decode(&errMap)
+				sbody, err := io.ReadAll(body)
 				if err == nil {
-					if msg, ok := errMap["message"]; ok {
-						return errors.New(msg)
+					var errMap map[string]interface{}
+					err := json.Unmarshal(sbody, &errMap)
+					if err == nil {
+						if _, ok := errMap["errors"]; ok {
+							errMap, _ = errMap["errors"].(map[string]interface{})
+						}
+						if msg, ok := errMap["message"]; ok {
+							msg, _ := msg.(string)
+							return errors.New(msg)
+						}
 					}
 				}
 
-				return fmt.Errorf("server returned unexpected status %d", status)
+				return fmt.Errorf("server returned unexpected status %d: %s", status, string(sbody))
 			}),
 	}
 }
@@ -193,6 +200,7 @@ func (c *Client) Codify(assetType, assetID string) (output string, err error) {
 }
 
 type Drift struct {
+	AccountID string `json:"accountId"`
 	ID        string `json:"driftId"`
 	CreatedAt int64  `json:"createdAt"`
 	Total     int64  `json:"total"`
@@ -214,6 +222,7 @@ const (
 )
 
 type Asset struct {
+	AccountID     string          `json:"accountId"`
 	ID            string          `json:"assetId"`
 	Type          string          `json:"assetType"`
 	Hash          string          `json:"hash"`
@@ -256,6 +265,7 @@ func (c *Client) ShowAsset(assetID string) (list []Asset, err error) {
 }
 
 type State struct {
+	AccountID string          `json:"accountId"`
 	ID        string          `json:"id"`
 	StackID   string          `json:"stackId"`
 	CreatedAt time.Time       `json:"createdAt,omitempty"`
@@ -287,20 +297,25 @@ func (c *Client) UploadStatePolicy(
 	stackID string,
 	tfState, policy json.RawMessage,
 ) (err error) {
-	var jsonPolicy map[string]interface{}
-	err = json.Unmarshal(policy, &jsonPolicy)
-	if err != nil {
-		return fmt.Errorf("failed decoding policy: %w", err)
+	body := map[string]interface{}{
+		"tfState": string(tfState),
+	}
+
+	if len(policy) > 0 {
+		var jsonPolicy map[string]interface{}
+		err = json.Unmarshal(policy, &jsonPolicy)
+		if err != nil {
+			return fmt.Errorf("failed decoding policy: %w", err)
+		}
+
+		body["policy"] = jsonPolicy
 	}
 
 	err = c.httpc.NewRequest(
 		"POST",
 		fmt.Sprintf("/states/stack/%s/upload", url.PathEscape(stackID)),
 	).
-		JSONBody(map[string]interface{}{
-			"tfState": string(tfState),
-			"policy":  jsonPolicy,
-		}).
+		JSONBody(body).
 		ExpectedStatus(http.StatusNoContent).
 		Run()
 	return err

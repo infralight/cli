@@ -18,10 +18,11 @@ var (
 type HomeTab struct {
 	width  int
 	height int
+	ready  bool
 }
 
-func NewHomeTab(_ *client.Client, width int) *HomeTab {
-	return &HomeTab{width: width}
+func NewHomeTab(_ *client.Client) *HomeTab {
+	return &HomeTab{}
 }
 
 func (m *HomeTab) Key() string                 { return "0" }
@@ -36,12 +37,17 @@ func (m *HomeTab) Init() tea.Cmd {
 func (m *HomeTab) Update(msg tea.Msg) (model tea.Model, cmd tea.Cmd) {
 	if size, ok := msg.(tea.WindowSizeMsg); ok {
 		m.width = size.Width
-		m.height = size.Height - 6
+		m.height = size.Height - verticalMargins
+		m.ready = true
 	}
 	return m, nil
 }
 
 func (m *HomeTab) View() string {
+	if !m.ready {
+		return "\n  Initializing..."
+	}
+
 	return fmt.Sprintf(
 		"%s\n\n",
 		lipgloss.Place(
