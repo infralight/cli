@@ -293,7 +293,7 @@ func (c *Client) GetLatestState(stackID string) (list State, err error) {
 	return list, err
 }
 
-func (c *Client) UploadStatePolicy(
+func (c *Client) UploadState(
 	stackID string,
 	tfState, policy json.RawMessage,
 ) (err error) {
@@ -316,6 +316,40 @@ func (c *Client) UploadStatePolicy(
 		fmt.Sprintf("/states/stack/%s/upload", url.PathEscape(stackID)),
 	).
 		JSONBody(body).
+		ExpectedStatus(http.StatusNoContent).
+		Run()
+	return err
+}
+
+func (c *Client) GetStatePolicy(stackID string) (list State, err error) {
+	err = c.httpc.NewRequest(
+		"GET",
+		fmt.Sprintf("/states/policy/%s", url.PathEscape(stackID)),
+	).
+		Into(&list).
+		Run()
+	return list, err
+}
+
+func (c *Client) UpdateStatePolicy(
+	stackID string,
+	selected string,
+	policy json.RawMessage,
+) (err error) {
+	var jsonPolicy map[string]interface{}
+	err = json.Unmarshal(policy, &jsonPolicy)
+	if err != nil {
+		return fmt.Errorf("failed decoding policy: %w", err)
+	}
+
+	err = c.httpc.NewRequest(
+		"PUT",
+		fmt.Sprintf("/states/policy/%s", url.PathEscape(stackID)),
+	).
+		JSONBody(map[string]interface{}{
+			"selected": selected,
+			"policy":   jsonPolicy,
+		}).
 		ExpectedStatus(http.StatusNoContent).
 		Run()
 	return err

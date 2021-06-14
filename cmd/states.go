@@ -10,7 +10,7 @@ import (
 
 var statesCmd = &cobra.Command{
 	Use:   "states [cmd]",
-	Short: "View States",
+	Short: "Manage States",
 	Args:  cobra.MinimumNArgs(1),
 }
 
@@ -63,7 +63,7 @@ var statesUploadCmd = &cobra.Command{
 			}
 		}
 
-		err = c.UploadStatePolicy(args[0], tfState, policy)
+		err = c.UploadState(args[0], tfState, policy)
 		if err != nil {
 			return fmt.Errorf("failed uploading policy: %w", err)
 		}
