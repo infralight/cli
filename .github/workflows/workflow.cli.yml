@@ -1,0 +1,49 @@
+name: AWS CLI
+on:
+  workflow_dispatch:
+    inputs:
+      dest:
+        description: 'Environment to deploy [stag|prod]'     
+        required: true
+        default: 'stag'
+jobs:
+  CI:
+    env:
+      SLACK_CHANNEL: deployments
+    name: "${{ github.event.inputs.dest }} CLI"
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set environment varible
+      run: |
+        echo "ARTIFACT_AWS_S3_BUCKET=${{ github.event.inputs.dest }}-infralight-artifacts" >> $GITHUB_ENV
+        echo "AWS_REGION_VAR_NAME=${{ github.event.inputs.dest }}_AWS_REGION" >> $GITHUB_ENV
+    - name: Prod check
+      if: ${{ github.event.inputs.dest == 'prod' }}
+      run: |
+        echo "SLACK_CHANNEL=prod-${{ env.SLACK_CHANNEL }}" >> $GITHUB_ENV
+    - name: Check out repository
+      uses: actions/checkout@v2
+    - name: Setup GO
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.16.1'
+    - name: Build
+      run: ./task build
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.CI_AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.CI_AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets[env.AWS_REGION_VAR_NAME] }}
+    - name: Deploy
+      run: ls
+    - name: Slack Notification
+      if: ${{ success() }}
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_COLOR: ${{ job.status }}
+        SLACK_ICON: https://assets-global.website-files.com/5d514fd9493b0575f03520bd/5d8e0b39fd776a3c238e8753_icons8_infinity_large_filled_2.svg
+        SLACK_MESSAGE: "${{ github.event.inputs.dest }} Drift successfully deployed from ${{ github.ref }}"
+        SLACK_TITLE: "${{ github.event.inputs.dest }} Drift deployment notification"
+        SLACK_USERNAME: cicdBot
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
