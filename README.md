@@ -13,7 +13,7 @@
     * [Example 3: List Available Environments](#example-3-list-available-environments)
 * [Development](#development)
     * [Requirements](#requirements)
-    * [Unit Tests and Static Code Analysis](#unit-tests-and-static-code-analysis)
+    * [Available Tasks](#available-tasks)
 
 <!-- vim-markdown-toc -->
 
@@ -44,11 +44,7 @@ TODO: once published, modify instructions to download the executable.
 ```sh
 go clone git@github.com:infralight/cli.git
 cd cli
-CGO_ENABLED=0 \
-    go build -a -tags netgo \
-    -ldflags '-w -extldflags "-static"' \
-    -o infralight \
-    main.go
+./task build
 sudo install -Dm755 infralight /usr/local/bin/infralight
 ```
 
@@ -103,19 +99,18 @@ By default, output is one-lined JSON. To pretty print, add the `--pretty` flag.
 
 ## Development
 
-During development, execute the code directly with `go run main.go`.
+This repository includes a development and CI/CD shell script, [task](task), to
+execute common tasks such as compiling the CLI and running tests.
 
 ### Requirements
 
 * [Go](https://golang.org/) v1.16+
 * [golangci-lint](https://golangci-lint.run/) v1.35+
 
-### Unit Tests and Static Code Analysis
+### Available Tasks
 
-To execute unit tests and static code analysis, run:
-
-```sh
-$ go build
-$ go test ./...
-$ golangci-lint run ./...
-```
+- **build:** compiles a statically-linked executable of the CLI. Will also
+  automatically set a version number for the executable from the shorten commit
+  hash and the build date.
+- **test**: runs unit tests on the entire project.
+- **lint:** runs static code analysis and linters on the entire project.

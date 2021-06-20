@@ -20,7 +20,7 @@ var rootCmd = &cobra.Command{
 	Use:   "infralight",
 	Short: "Command line interface for the Infralight SaaS",
 	PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
-		if cmd.Name() == "configure" {
+		if cmd.Name() == "configure" || cmd.Name() == "version" {
 			return nil
 		}
 

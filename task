@@ -1,0 +1,75 @@
+#!/bin/bash
+set -eu -o pipefail
+
+# colored output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+# find all lambda functions
+FUNCS=()
+for func in $(find . -name lambda.yml -not -path "*/\.*" | sort); do
+    func=${func#"./"}
+    func=${func%"/lambda.yml"}
+    FUNCS+=($func)
+done
+
+ROOT=`pwd`
+
+usage() {
+    echo -e "${CYAN}Infralight CLI: CI/CD Tool${NC}"
+    echo "----------------------------------------"
+    echo "Usage: $0 [-h] <command> [arguments]"
+    echo ""
+    echo "OPTIONS:"
+    echo -e "  ${CYAN}-h${NC}: Show usage information (this text)"
+    echo ""
+    echo "COMMANDS:"
+    echo -e "  * ${CYAN}build${NC}: compile an executable of the CLI"
+    echo -e "  * ${CYAN}test${NC}: run unit tests"
+    echo -e "  * ${CYAN}lint${NC}: run static code analysis"
+}
+
+exit_abnormal() {
+    usage
+    exit 1
+}
+
+while getopts "h" opts; do
+    case "${opts}" in
+        h)
+            usage
+            exit 0
+            ;;
+        :)
+            echo "Error: -${OPTARG} requires an argument."
+            exit_abnormal
+            ;;
+        *)
+            exit_abnormal
+            ;;
+    esac
+done
+
+# parse command line arguments
+shift $((OPTIND-1))
+COMMAND="${1}"
+shift
+ARGS=("$@")
+
+case "${COMMAND}" in
+    build)
+        CGO_ENABLED=0 \
+            go build -a -tags netgo \
+            -ldflags "-w -extldflags '-static' -X github.com/infralight/cli/version.Version=`git rev-parse --short HEAD`.`date +%y%m%d`" \
+            -o infralight \
+            main.go
+        ;;
+    test)
+        go test ./...
+        ;;
+    lint)
+        golangci-lint run ./...
+        ;;
+esac
