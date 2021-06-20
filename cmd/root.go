@@ -33,10 +33,10 @@ var rootCmd = &cobra.Command{
 			// prompt the user for a keypair
 			conf, err := config.LoadConfig(profile)
 			if err != nil {
-				if errors.Is(err, config.ErrConfigNotFound) {
+				if profile == "default" && errors.Is(err, config.ErrConfigNotFound) {
 					// no configuration profiles exist yet, so force the user to
 					// configure
-					err = tui.StartConfigure()
+					profile, err = tui.StartConfigure("No profile exists, please create one")
 					if err != nil {
 						return err
 					}
