@@ -10,6 +10,7 @@ jobs:
   CI:
     env:
       SLACK_CHANNEL: deployments
+      S3_BUCKET_CLI: infralight-templates-public
     name: "${{ github.event.inputs.dest }} Infralight CLI"
     runs-on: ubuntu-latest
     steps:
@@ -39,8 +40,13 @@ jobs:
         aws-access-key-id: ${{ secrets.CI_AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.CI_AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets[env.AWS_REGION_VAR_NAME] }}
-    - name: Deploy
-      run: ls
+    - name: Upload files
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --follow-symlinks --exclude='*' --include='infralight'
+      env:
+        DEST_DIR: 'files/cli'
+        AWS_S3_BUCKET: ${{ env.ARTIFACT_AWS_S3_BUCKET }}
     - name: Slack Notification
       if: ${{ success() }}
       uses: rtCamp/action-slack-notify@v2
