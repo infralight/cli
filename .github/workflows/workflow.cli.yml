@@ -1,4 +1,4 @@
-name: AWS CLI
+name: Infralight CLI
 on:
   workflow_dispatch:
     inputs:
@@ -10,12 +10,12 @@ jobs:
   CI:
     env:
       SLACK_CHANNEL: deployments
-    name: "${{ github.event.inputs.dest }} CLI"
+    name: "${{ github.event.inputs.dest }} Infralight CLI"
     runs-on: ubuntu-latest
     steps:
     - name: Set environment varible
       run: |
-        echo "ARTIFACT_AWS_S3_BUCKET=${{ github.event.inputs.dest }}-infralight-artifacts" >> $GITHUB_ENV
+        echo "ARTIFACT_AWS_S3_BUCKET=${{ github.event.inputs.dest }}-infralight-dashboard-static" >> $GITHUB_ENV
         echo "AWS_REGION_VAR_NAME=${{ github.event.inputs.dest }}_AWS_REGION" >> $GITHUB_ENV
     - name: Prod check
       if: ${{ github.event.inputs.dest == 'prod' }}
@@ -26,9 +26,13 @@ jobs:
     - name: Setup GO
       uses: actions/setup-go@v2
       with:
-        go-version: '1.16.1'
+        go-version: '1.16'
     - name: Build
       run: ./task build
+    - name: Test
+      run: ./task test
+    - name: Lint
+      run: ./task lint
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
