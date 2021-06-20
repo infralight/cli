@@ -32,8 +32,22 @@ var rootCmd = &cobra.Command{
 			// ensures that if no configuration file exists at all, we will
 			// prompt the user for a keypair
 			conf, err := config.LoadConfig(profile)
-			if err != nil && (profile != "default" || !errors.Is(err, config.ErrConfigNotFound)) {
-				return err
+			if err != nil {
+				if errors.Is(err, config.ErrConfigNotFound) {
+					// no configuration profiles exist yet, so force the user to
+					// configure
+					err = tui.StartConfigure()
+					if err != nil {
+						return err
+					}
+
+					// reload this configuration
+					conf, err = config.LoadConfig(profile)
+				}
+
+				if err != nil {
+					return err
+				}
 			}
 
 			accessKey = conf.AccessKey
@@ -45,12 +59,7 @@ var rootCmd = &cobra.Command{
 		c = client.New(apiURL, authHeader)
 
 		if accessKey == "" && secretKey == "" {
-			if cmd.Name() == "infralight" {
-				// the TUI does not require a key-pair
-				return nil
-			}
-
-			return errors.New("access and secret key must be provided")
+			return errors.New("access and secret keys must be provided")
 		}
 
 		fmt.Fprintf(os.Stderr, "Using profile %q against %q...\n\n", profile, apiURL)
