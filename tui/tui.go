@@ -11,6 +11,8 @@ import (
 	"golang.org/x/term"
 )
 
+const initializing = "\n  Initializing..."
+
 type Model struct {
 	signIn    *SignInModel
 	tabs      []Tab
@@ -90,7 +92,7 @@ func (m *Model) Update(msg tea.Msg) (model tea.Model, cmd tea.Cmd) {
 
 func (m *Model) View() string {
 	if !m.ready {
-		return "\n  Initializing..."
+		return initializing
 	}
 
 	var b strings.Builder

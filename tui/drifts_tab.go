@@ -99,7 +99,7 @@ func (m *DriftsTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *DriftsTab) View() string {
 	if !m.ready {
-		return "\n  Initializing..."
+		return initializing
 	}
 
 	var b strings.Builder
@@ -247,7 +247,7 @@ func (m *DriftsTab) codify() tea.Msg {
 
 	var b strings.Builder
 	for _, line := range strings.Split(code, "\n") {
-		fmt.Fprintln(&b, strings.Replace(line, "\t", "    ", -1))
+		fmt.Fprintln(&b, strings.ReplaceAll(line, "\t", "    "))
 	}
 
 	m.codifyVP = NewViewport(b.String(), m.width, m.height)

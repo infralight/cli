@@ -11,15 +11,14 @@ import (
 )
 
 type EnvsTab struct {
-	isLoading  bool
-	loading    spinner.Model
-	chooser    *ChooserViewport
-	currentEnv client.Environment
-	err        error
-	c          *client.Client
-	width      int
-	height     int
-	ready      bool
+	isLoading bool
+	loading   spinner.Model
+	chooser   *ChooserViewport
+	err       error
+	c         *client.Client
+	width     int
+	height    int
+	ready     bool
 }
 
 func NewEnvsTab(c *client.Client) *EnvsTab {
@@ -70,7 +69,7 @@ func (m *EnvsTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *EnvsTab) View() string {
 	if !m.ready {
-		return "\n  Initializing..."
+		return initializing
 	}
 
 	var b strings.Builder

@@ -45,7 +45,7 @@ func (m *HomeTab) Update(msg tea.Msg) (model tea.Model, cmd tea.Cmd) {
 
 func (m *HomeTab) View() string {
 	if !m.ready {
-		return "\n  Initializing..."
+		return initializing
 	}
 
 	return fmt.Sprintf(
