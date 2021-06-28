@@ -39,7 +39,7 @@ func NewDriftsTab(c *client.Client) *DriftsTab {
 }
 
 func (envs *DriftsTab) Key() string                 { return "2" }
-func (envs *DriftsTab) Name() string                { return "Drifts" }
+func (envs *DriftsTab) Name() string                { return "Inventory" }
 func (envs *DriftsTab) NormalStyle() lipgloss.Style { return normalTabStyle }
 func (envs *DriftsTab) ActiveStyle() lipgloss.Style { return activeTabStyle }
 
