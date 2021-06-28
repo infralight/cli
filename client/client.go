@@ -143,6 +143,16 @@ type Stack struct {
 	Name string `json:"name"`
 }
 
+func (c *Client) CreateStack(envID, name string) (stack Stack, err error) {
+	err = c.httpc.NewRequest("POST", fmt.Sprintf("/environments/%s/stack/", envID)).
+		JSONBody(map[string]interface{}{
+			"name": name,
+		}).
+		Into(&stack).
+		Run()
+	return stack, err
+}
+
 func (c *Client) ListStacks(envID string) (list []Stack, err error) {
 	err = c.httpc.NewRequest("GET", fmt.Sprintf("/environments/%s/stack/", envID)).
 		Into(&list).

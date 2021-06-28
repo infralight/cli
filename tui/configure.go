@@ -12,13 +12,15 @@ import (
 )
 
 type ConfigureModel struct {
-	index        int
-	inputs       []textinput.Model
-	submitButton string
-	done         bool
+	index          int
+	inputs         []textinput.Model
+	message        string
+	submitButton   string
+	done           bool
+	createdProfile string
 }
 
-func StartConfigure() error {
+func StartConfigure(showMessage string) (profile string, err error) {
 	profileInput := textinput.NewModel()
 	profileInput.Placeholder = "Profile [default]"
 	profileInput.PromptStyle = purpleText
@@ -51,7 +53,8 @@ func StartConfigure() error {
 	authHeaderInput.PromptStyle = purpleText
 	authHeaderInput.TextStyle = purpleText
 
-	return tea.NewProgram(ConfigureModel{
+	m := &ConfigureModel{
+		message: showMessage,
 		inputs: []textinput.Model{
 			profileInput,
 			urlInput,
@@ -60,14 +63,21 @@ func StartConfigure() error {
 			secretKeyInput,
 		},
 		submitButton: blurredSubmitButton,
-	}).Start()
+	}
+
+	err = tea.NewProgram(m).Start()
+	if err != nil {
+		return profile, err
+	}
+
+	return m.createdProfile, nil
 }
 
-func (m ConfigureModel) Init() tea.Cmd {
+func (m *ConfigureModel) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (m ConfigureModel) Update(msg tea.Msg) (model tea.Model, cmd tea.Cmd) {
+func (m *ConfigureModel) Update(msg tea.Msg) (model tea.Model, cmd tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -137,12 +147,16 @@ func (m ConfigureModel) Update(msg tea.Msg) (model tea.Model, cmd tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func (m ConfigureModel) View() string {
+func (m *ConfigureModel) View() string {
 	if m.done {
 		return ""
 	}
 
 	var b strings.Builder
+
+	if m.message != "" {
+		fmt.Fprintf(&b, "%s:\n\n", m.message)
+	}
 
 	for i := 0; i < len(m.inputs); i++ {
 		b.WriteString(m.inputs[i].View())
@@ -156,7 +170,7 @@ func (m ConfigureModel) View() string {
 	return b.String()
 }
 
-func (m ConfigureModel) writeConfig() tea.Msg {
+func (m *ConfigureModel) writeConfig() tea.Msg {
 	c := config.Config{
 		Profile:             m.inputs[0].Value(),
 		URL:                 m.inputs[1].Value(),
@@ -174,14 +188,19 @@ func (m ConfigureModel) writeConfig() tea.Msg {
 	if c.AuthorizationHeader == "" {
 		c.AuthorizationHeader = client.DefaultAuthHeader
 	}
-	if c.AccessKey == "" || c.SecretKey == "" {
-		return errMsg{errors.New("Keypair must be provided")}
+	if c.AccessKey == "" {
+		return errMsg{errors.New("Access key must be provided")}
+	}
+	if c.SecretKey == "" {
+		return errMsg{errors.New("Secret key must be provided")}
 	}
 
 	path, err := c.Save()
 	if err != nil {
 		return errMsg{err}
 	}
+
+	m.createdProfile = c.Profile
 
 	return successMsg(path)
 }
