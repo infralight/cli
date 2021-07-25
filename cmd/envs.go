@@ -44,6 +44,6 @@ var envCreateCmd = &cobra.Command{
 
 func init() {
 	envsCmd.AddCommand(envsListCmd)
-	rootCmd.AddCommand(envCreateCmd)
+    envsCmd.AddCommand(envCreateCmd)
 	rootCmd.AddCommand(envsCmd)
 }
