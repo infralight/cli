@@ -138,15 +138,15 @@ func (c *Client) ListEnvironments() (list []Environment, err error) {
 	return list, err
 }
 
-func (c *Client) CreateEnvironment(name, envType string) (output string, err error) {
+func (c *Client) CreateEnvironment(name string, envType string) (environment Environment, err error) {
 	err = c.httpc.NewRequest("POST", "/environments").
         JSONBody(map[string]string{
             "name": name,
             "type": envType,
         }).
-		Into(&output).
+		Into(&environment).
 		Run()
-	return output, err
+	return environment, err
 }
 
 type Stack struct {
