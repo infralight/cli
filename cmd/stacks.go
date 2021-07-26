@@ -9,13 +9,16 @@ import (
 )
 
 var (
-	stacksCreateLocation        string
-	stacksCreateStatePath       string
-	stacksCreateS3IntegrationID string
-	stacksCreateS3Bucket        string
-	stacksCreateS3Key           string
-	stacksCreateTfCAPIToken     string
-	stacksCreateTfCWorkspaceID  string
+	stacksCreateLocation         string
+	stacksCreateStatePath        string
+	stacksCreateS3IntegrationID  string
+	stacksCreateS3Bucket         string
+	stacksCreateS3Key            string
+	stacksCreateTfCAPIToken      string
+	stacksCreateTfCWorkspaceID   string
+	stacksCreateGcpIntegrationID string
+	stacksCreateGCSBucket        string
+	stacksCreateGCSKey           string
 )
 
 var stacksCmd = &cobra.Command{
@@ -60,6 +63,15 @@ var stacksCreateCmd = &cobra.Command{
 			})
 			if err != nil {
 				return fmt.Errorf("failed encoding TfC policy: %w", err)
+			}
+		} else if stacksCreateLocation == "gcs" && stacksCreateGcpIntegrationID != "" {
+			policy, err = json.Marshal(map[string]interface{}{
+				"gcpIntegration": stacksCreateGcpIntegrationID,
+				"gcsBucket":      stacksCreateGCSBucket,
+				"gcsKey":         stacksCreateGCSKey,
+			})
+			if err != nil {
+				return fmt.Errorf("failed encoding Gcs policy: %w", err)
 			}
 		}
 
@@ -134,6 +146,9 @@ func init() {
 	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateS3Key, "s3-key", "", "S3 key")
 	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateTfCAPIToken, "tfc-api-token", "", "Terraform Cloud API Token")
 	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateTfCWorkspaceID, "tfc-workspace-id", "", "Terraform Cloud workspace ID")
+	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateGcpIntegrationID, "gcp-integration-id", "", "GCP Integration ID")
+	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateGCSBucket, "gcs-bucket", "", "GCS name")
+	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateGCSKey, "gcs-key", "", "GCS key")
 	stacksCmd.AddCommand(stacksCreateCmd, stacksListCmd, stacksGetCmd, stacksDeleteCmd)
 	rootCmd.AddCommand(stacksCmd)
 }
