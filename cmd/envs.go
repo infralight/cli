@@ -67,5 +67,6 @@ func init() {
 	envCreateCmd.PersistentFlags().StringVar(&environmentCreateType, "type", "iacStack", "Environment Type")
 	envsCmd.AddCommand(envCreateCmd)
 	envsCmd.AddCommand(envsListCmd)
+	envsCmd.AddCommand(envDeleteCmd)
 	rootCmd.AddCommand(envsCmd)
 }
