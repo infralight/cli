@@ -32,6 +32,21 @@ var envsListCmd = &cobra.Command{
 	},
 }
 
+var envDeleteCmd = &cobra.Command{
+	Use:           "delete",
+	Short:         "Delete Infralight Environment",
+	Args:          cobra.ExactArgs(1),
+	SilenceErrors: true,
+	RunE: func(_ *cobra.Command, args []string) error {
+		env, err := c.DeleteEnvironment(args[0])
+		if err != nil {
+			return fmt.Errorf("failed deleting environment")
+		}
+
+		return render(env)
+	},
+}
+
 var envCreateCmd = &cobra.Command{
 	Use:           "create ENVIRONMENT_NAME ENVIRONMENT_TYPE",
 	Short:         "Create Infralight Environment",
@@ -52,5 +67,6 @@ func init() {
 	envCreateCmd.PersistentFlags().StringVar(&environmentCreateType, "type", "iacStack", "Environment Type")
 	envsCmd.AddCommand(envCreateCmd)
 	envsCmd.AddCommand(envsListCmd)
+	envsCmd.AddCommand(envDeleteCmd)
 	rootCmd.AddCommand(envsCmd)
 }
