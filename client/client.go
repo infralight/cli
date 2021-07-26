@@ -140,10 +140,10 @@ func (c *Client) ListEnvironments() (list []Environment, err error) {
 
 func (c *Client) CreateEnvironment(name string, envType string) (environment Environment, err error) {
 	err = c.httpc.NewRequest("POST", "/environments").
-        JSONBody(map[string]string{
-            "name": name,
-            "type": envType,
-        }).
+		JSONBody(map[string]string{
+			"name": name,
+			"type": envType,
+		}).
 		Into(&environment).
 		Run()
 	return environment, err

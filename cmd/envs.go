@@ -7,8 +7,8 @@ import (
 )
 
 var (
-    environmentCreateType        string
-    environmentCreateName        string
+	environmentCreateType string
+	environmentCreateName string
 )
 
 var envsCmd = &cobra.Command{
@@ -35,7 +35,7 @@ var envsListCmd = &cobra.Command{
 var envCreateCmd = &cobra.Command{
 	Use:           "create ENVIRONMENT_NAME ENVIRONMENT_TYPE",
 	Short:         "Create Infralight Environment",
-    Args:          cobra.NoArgs,
+	Args:          cobra.NoArgs,
 	SilenceErrors: true,
 	RunE: func(_ *cobra.Command, args []string) error {
 		env, err := c.CreateEnvironment(environmentCreateName, environmentCreateType)
@@ -48,9 +48,9 @@ var envCreateCmd = &cobra.Command{
 }
 
 func init() {
-    envCreateCmd.PersistentFlags().StringVar(&environmentCreateName, "name", "", "Environment Name")
-    envCreateCmd.PersistentFlags().StringVar(&environmentCreateType, "type", "iacStack", "Environment Type")
-    envsCmd.AddCommand(envCreateCmd)
+	envCreateCmd.PersistentFlags().StringVar(&environmentCreateName, "name", "", "Environment Name")
+	envCreateCmd.PersistentFlags().StringVar(&environmentCreateType, "type", "iacStack", "Environment Type")
+	envsCmd.AddCommand(envCreateCmd)
 	envsCmd.AddCommand(envsListCmd)
 	rootCmd.AddCommand(envsCmd)
 }
