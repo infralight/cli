@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/infralight/cli/client"
 	"github.com/infralight/cli/config"
@@ -64,7 +65,15 @@ var rootCmd = &cobra.Command{
 
 		fmt.Fprintf(os.Stderr, "Using profile %q against %q...\n\n", profile, apiURL)
 
-		return c.Authenticate(accessKey, secretKey)
+		for {
+			err := c.Authenticate(accessKey, secretKey)
+			if err != nil {
+				// in case the new access key / secret are not yet registered in Auth0, we do sleep and retry
+				time.Sleep(10 * time.Second)
+				return c.Authenticate(accessKey, secretKey)
+			}
+			return err
+		}
 	},
 	RunE: func(_ *cobra.Command, _ []string) error {
 		return tui.Start(c, accessKey, secretKey)
