@@ -65,15 +65,13 @@ var rootCmd = &cobra.Command{
 
 		fmt.Fprintf(os.Stderr, "Using profile %q against %q...\n\n", profile, apiURL)
 
-		for {
-			err := c.Authenticate(accessKey, secretKey)
-			if err != nil {
-				// in case the new access key / secret are not yet registered in Auth0, we do sleep and retry
-				time.Sleep(10 * time.Second)
-				return c.Authenticate(accessKey, secretKey)
-			}
-			return err
+		err := c.Authenticate(accessKey, secretKey)
+		if err != nil {
+			// in case the new access key / secret are not yet registered in Auth0, we do sleep and retry
+			time.Sleep(10 * time.Second)
+			return c.Authenticate(accessKey, secretKey)
 		}
+		return nil
 	},
 	RunE: func(_ *cobra.Command, _ []string) error {
 		return tui.Start(c, accessKey, secretKey)
