@@ -9,6 +9,8 @@ import (
 )
 
 var (
+	stacksCreateName             string
+	stacksCreateEnv              string
 	stacksCreateLocation         string
 	stacksCreateStatePath        string
 	stacksCreateS3IntegrationID  string
@@ -19,6 +21,11 @@ var (
 	stacksCreateGcpIntegrationID string
 	stacksCreateGCSBucket        string
 	stacksCreateGCSKey           string
+	stacksListEnv                string
+	stacksGetEnv                 string
+	StacksGetStackId             string
+	stacksDeleteEnv              string
+	StacksDeleteStackId          string
 )
 
 var stacksCmd = &cobra.Command{
@@ -28,12 +35,12 @@ var stacksCmd = &cobra.Command{
 }
 
 var stacksCreateCmd = &cobra.Command{
-	Use:           "create ENVIRONMENT_ID NAME",
+	Use:           "create --env-id ENVIRONMENT_ID --name NAME --state-path STATE_PATH --location FILE_LOCATION",
 	Short:         "Create a Stack",
-	Args:          cobra.ExactArgs(2),
+	Args:          cobra.NoArgs,
 	SilenceErrors: true,
 	RunE: func(_ *cobra.Command, args []string) error {
-		stack, err := c.CreateStack(args[0], args[1])
+		stack, err := c.CreateStack(stacksCreateEnv, stacksCreateName)
 		if err != nil {
 			return fmt.Errorf("failed creating stack: %w", err)
 		}
@@ -93,12 +100,12 @@ var stacksCreateCmd = &cobra.Command{
 }
 
 var stacksListCmd = &cobra.Command{
-	Use:           "list <env_id>",
+	Use:           "list --env-id ENVIRONMENT_ID",
 	Short:         "List States in an Environment",
-	Args:          cobra.ExactArgs(1),
+	Args:          cobra.NoArgs,
 	SilenceErrors: true,
 	RunE: func(_ *cobra.Command, args []string) error {
-		list, err := c.ListStacks(args[0])
+		list, err := c.ListStacks(stacksListEnv)
 		if err != nil {
 			return fmt.Errorf("failed listing stacks: %w", err)
 		}
@@ -108,12 +115,12 @@ var stacksListCmd = &cobra.Command{
 }
 
 var stacksGetCmd = &cobra.Command{
-	Use:           "get <environment_id> <stack_id>",
+	Use:           "get --env-id ENVIRONMENT_ID --stack-id STACK_ID",
 	Short:         "Get a Specific Stack",
-	Args:          cobra.ExactArgs(2),
+	Args:          cobra.NoArgs,
 	SilenceErrors: true,
 	RunE: func(_ *cobra.Command, args []string) error {
-		stack, err := c.GetStack(args[0], args[1])
+		stack, err := c.GetStack(stacksGetEnv, StacksGetStackId)
 		if err != nil {
 			return fmt.Errorf("failed getting stack %s:%s: %w", args[0], args[1], err)
 		}
@@ -123,12 +130,12 @@ var stacksGetCmd = &cobra.Command{
 }
 
 var stacksDeleteCmd = &cobra.Command{
-	Use:           "delete <environment_id> <stack_id>",
+	Use:           "delete --env-id ENVIRONMENT_ID --stack-id STACK_ID",
 	Short:         "Delete a Specific Stack",
-	Args:          cobra.ExactArgs(2),
+	Args:          cobra.NoArgs,
 	SilenceErrors: true,
 	RunE: func(_ *cobra.Command, args []string) error {
-		stack, err := c.DeleteStack(args[0], args[1])
+		stack, err := c.DeleteStack(stacksDeleteEnv, StacksDeleteStackId)
 		if err != nil {
 			return fmt.Errorf("failed deleting stack %s:%s: %w", args[0], args[1], err)
 		}
@@ -139,8 +146,14 @@ var stacksDeleteCmd = &cobra.Command{
 
 // nolint: lll
 func init() {
+	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateStatePath, "name", "", "Stack name")
+	stacksCreateCmd.MarkPersistentFlagRequired("name")
+	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateStatePath, "env-id", "", "The environment id to create the stack into")
+	stacksCreateCmd.MarkPersistentFlagRequired("env-id")
 	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateStatePath, "state-path", "", "Path to state file")
+	stacksCreateCmd.MarkPersistentFlagRequired("state-path")
 	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateLocation, "location", "manual", "Policy location")
+	stacksCreateCmd.MarkPersistentFlagRequired("location")
 	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateS3IntegrationID, "s3-aws-integration-id", "", "AWS Integration ID")
 	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateS3Bucket, "s3-bucket", "", "S3 bucket ARN")
 	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateS3Key, "s3-key", "", "S3 key")
@@ -149,6 +162,19 @@ func init() {
 	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateGcpIntegrationID, "gcp-integration-id", "", "GCP Integration ID")
 	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateGCSBucket, "gcs-bucket", "", "GCS name")
 	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateGCSKey, "gcs-key", "", "GCS key")
+
+	stacksGetCmd.PersistentFlags().StringVar(&StacksGetStackId, "stack-id", "", "Stack Id")
+	stacksGetCmd.MarkPersistentFlagRequired("stack-id")
+	stacksGetCmd.PersistentFlags().StringVar(&stacksGetEnv, "env-id", "", "Environment Id of the chosen stack")
+	stacksGetCmd.MarkPersistentFlagRequired("env-id")
+
+	stacksDeleteCmd.PersistentFlags().StringVar(&StacksDeleteStackId, "stack-id", "", "Stack Id")
+	stacksDeleteCmd.MarkPersistentFlagRequired("stack-id")
+	stacksDeleteCmd.PersistentFlags().StringVar(&stacksDeleteEnv, "env-id", "", "Environment Id of the chosen stack")
+	stacksDeleteCmd.MarkPersistentFlagRequired("env-id")
+
+	stacksListCmd.PersistentFlags().StringVar(&stacksListEnv, "env-id", "", "The environment id to list the stacks for")
+	stacksListCmd.MarkPersistentFlagRequired("env-id")
 	stacksCmd.AddCommand(stacksCreateCmd, stacksListCmd, stacksGetCmd, stacksDeleteCmd)
 	rootCmd.AddCommand(stacksCmd)
 }
