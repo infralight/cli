@@ -42,7 +42,8 @@ var stacksCreateCmd = &cobra.Command{
 	SilenceErrors: true,
 	RunE: func(_ *cobra.Command, args []string) error {
 		sort.Strings(VALID_LOCATIONS)
-		if ind := sort.SearchStrings(VALID_LOCATIONS, stacksCreateLocation); ind > len(VALID_LOCATIONS) || ind < 0 || stacksCreateLocation != VALID_LOCATIONS[ind] {
+		ind := sort.SearchStrings(VALID_LOCATIONS, stacksCreateLocation)
+		if ind > len(VALID_LOCATIONS) || ind < 0 || stacksCreateLocation != VALID_LOCATIONS[ind] {
 			return fmt.Errorf("invalid location - %s", stacksCreateLocation)
 		}
 		stack, err := c.CreateStack(stacksCreateEnv, stacksCreateName)
