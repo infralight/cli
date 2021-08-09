@@ -146,11 +146,13 @@ func (c *Client) DeleteEnvironment(envId string) (message string, err error) {
 	return fmt.Sprintf("Environment %s deleted successfully", env.Name), err
 }
 
-func (c *Client) CreateEnvironment(name string, envType string) (environment Environment, err error) {
+func (c *Client) CreateEnvironment(name, envType, owner string, labels []string) (environment Environment, err error) {
 	err = c.httpc.NewRequest("POST", "/environments").
-		JSONBody(map[string]string{
-			"name": name,
-			"type": envType,
+		JSONBody(map[string]interface{}{
+			"name":   name,
+			"type":   envType,
+			"owner":  owner,
+			"labels": labels,
 		}).
 		Into(&environment).
 		Run()
@@ -159,6 +161,11 @@ func (c *Client) CreateEnvironment(name string, envType string) (environment Env
 
 type Stack struct {
 	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type User struct {
+	ID   string `json:"user_id"`
 	Name string `json:"name"`
 }
 
@@ -382,4 +389,14 @@ func (c *Client) UpdateStatePolicy(
 		ExpectedStatus(http.StatusNoContent).
 		Run()
 	return err
+}
+
+func (c *Client) ListUsers() (users []User, err error) {
+	err = c.httpc.NewRequest(
+		"GET",
+		"/users",
+	).
+		Into(&users).
+		Run()
+	return users, err
 }
