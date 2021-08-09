@@ -50,6 +50,7 @@ var envDeleteCmd = &cobra.Command{
 	},
 }
 
+// nolint:lll
 var envCreateCmd = &cobra.Command{
 	Use:           "create --name ENVIRONMENT_NAME --type ENVIRONMENT_TYPE --owner ENVIRONMENT_OWNER --labels=label1,label2",
 	Short:         "Create Infralight Environment",
@@ -65,6 +66,7 @@ var envCreateCmd = &cobra.Command{
 	},
 }
 
+//nolint
 func init() {
 	envCreateCmd.PersistentFlags().StringVar(&environmentCreateName, "name", "", "Environment Name")
 	envCreateCmd.MarkPersistentFlagRequired("name")

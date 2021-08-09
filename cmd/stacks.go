@@ -144,7 +144,7 @@ var stacksDeleteCmd = &cobra.Command{
 	},
 }
 
-// nolint: lll
+// nolint
 func init() {
 	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateStatePath, "name", "", "Stack name")
 	stacksCreateCmd.MarkPersistentFlagRequired("name")
