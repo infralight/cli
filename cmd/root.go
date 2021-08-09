@@ -15,7 +15,7 @@ import (
 
 var profile, authHeader, apiURL, accessKey, secretKey string
 var c *client.Client
-var prettyPrint, failOnError bool
+var prettyPrint, ignoreErrors bool
 
 var rootCmd = &cobra.Command{
 	Use:   "infralight",
@@ -119,20 +119,20 @@ func init() {
 		"Pretty-print JSON output",
 	)
 	rootCmd.PersistentFlags().BoolVar(
-		&failOnError,
-		"fail-on-error",
+		&ignoreErrors,
+		"no-fail-on-error",
 		false,
-		"Exit with a non-success code when errors are encountered",
+		"Exit with a success code even though errors are encountered",
 	)
 }
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		if failOnError {
-			os.Exit(1)
-		} else {
+		if ignoreErrors {
 			os.Exit(0)
+		} else {
+			os.Exit(1)
 		}
 	}
 }

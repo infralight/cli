@@ -158,7 +158,7 @@ func init() {
 	stacksCreateCmd.MarkPersistentFlagRequired("env-id")
 	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateStatePath, "state-path", "", "Path to state file (whether local or remote location")
 	stacksCreateCmd.MarkPersistentFlagRequired("state-path")
-	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateLocation, "location", "local", "Policy location [s3, gcp, tfc, local]")
+	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateLocation, "location", "local", "Policy location [s3, gcs, tfc, local]")
 	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateS3IntegrationID, "s3-aws-integration-id", "", "AWS Integration ID")
 	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateS3Bucket, "s3-bucket", "", "S3 bucket ARN")
 	stacksCreateCmd.PersistentFlags().StringVar(&stacksCreateStatePath, "s3-key", "", "S3 key")
