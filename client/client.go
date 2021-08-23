@@ -352,7 +352,7 @@ func (c *Client) UploadState(
 		fmt.Sprintf("/states/stack/%s/upload", url.PathEscape(stackID)),
 	).
 		JSONBody(body).
-		ExpectedStatus(http.StatusNoContent).
+		ExpectedStatus(http.StatusOK).
 		Run()
 	return err
 }
@@ -386,7 +386,7 @@ func (c *Client) UpdateStatePolicy(
 			"selected": selected,
 			"policy":   jsonPolicy,
 		}).
-		ExpectedStatus(http.StatusNoContent).
+		ExpectedStatus(http.StatusOK).
 		Run()
 	return err
 }
