@@ -36,7 +36,7 @@ var envsListCmd = &cobra.Command{
 }
 
 var envDeleteCmd = &cobra.Command{
-	Use:           "delete --id ENVIRONMENT_ID",
+	Use:           "delete --env-id ENVIRONMENT_ID",
 	Short:         "Delete Infralight Environment",
 	Args:          cobra.NoArgs,
 	SilenceErrors: true,
@@ -74,8 +74,8 @@ func init() {
 	envCreateCmd.PersistentFlags().StringVar(&environmentCreateOwner, "owner", "InfralightCli", "Environment owner. Use infralight users list to see available options")
 	envCreateCmd.MarkPersistentFlagRequired("owner")
 	envCreateCmd.PersistentFlags().StringSliceVar(&environmentCreateLabels, "labels", nil, "Environment labels.")
-	envDeleteCmd.PersistentFlags().StringVar(&environmentDeleteId, "id", "", "Environment Name")
-	envDeleteCmd.MarkPersistentFlagRequired("id")
+	envDeleteCmd.PersistentFlags().StringVar(&environmentDeleteId, "env-id", "", "The environment id to list the stacks for")
+	envDeleteCmd.MarkPersistentFlagRequired("env-id")
 	envsCmd.AddCommand(envCreateCmd)
 	envsCmd.AddCommand(envsListCmd)
 	envsCmd.AddCommand(envDeleteCmd)
