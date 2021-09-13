@@ -23,9 +23,14 @@ const (
 	DefaultAuthHeader    = "Authorization"
 )
 
-type Client struct {
+type baseClient struct {
 	authHeader string
 	httpc      *requests.HTTPClient
+}
+
+type Client struct {
+	Dragonfly *DragonflyClient
+	*baseClient
 }
 
 func New(url, authHeader string) *Client {
@@ -36,7 +41,7 @@ func New(url, authHeader string) *Client {
 		authHeader = DefaultAuthHeader
 	}
 
-	return &Client{
+	base := &baseClient{
 		authHeader: authHeader,
 		httpc: requests.NewClient(url).
 			Accept("application/json").
@@ -58,6 +63,11 @@ func New(url, authHeader string) *Client {
 
 				return fmt.Errorf("server returned unexpected status %d: %s", status, string(sbody))
 			}),
+	}
+
+	return &Client{
+		baseClient: base,
+		Dragonfly:  &DragonflyClient{base},
 	}
 }
 
