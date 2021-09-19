@@ -73,7 +73,7 @@ var (
 		RunE: func(_ *cobra.Command, args []string) error {
 			env, err := c.Dragonfly.UpdatePipeline(args[0], pipelineUpdateInput)
 			if err != nil {
-				return fmt.Errorf("failed deleting pipeline: %w", err)
+				return fmt.Errorf("failed updating pipeline: %w", err)
 			}
 
 			return render(env)
