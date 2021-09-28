@@ -163,7 +163,7 @@ func init() {
 		&classUpdateInput.Rego,
 		"rego",
 		"",
-		"Rego policy encoded in Base64 format . Use a dash ('-') to read code from standard input",
+		"Rego policy encoded in Base64 format. Use a dash ('-') to read code from standard input",
 	)
 
 	classCmd.AddCommand(
