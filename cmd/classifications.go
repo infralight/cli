@@ -16,20 +16,23 @@ var classCmd = &cobra.Command{
 	Aliases: []string{"class"},
 }
 
-var classListCmd = &cobra.Command{
-	Use:           "list",
-	Short:         "List Classifications",
-	Args:          cobra.NoArgs,
-	SilenceErrors: true,
-	RunE: func(_ *cobra.Command, _ []string) error {
-		list, err := c.Classifications.List()
-		if err != nil {
-			return fmt.Errorf("failed listing classifications: %w", err)
-		}
+var (
+	classListInput client.ListClassificationsInput
+	classListCmd   = &cobra.Command{
+		Use:           "list",
+		Short:         "List Classifications",
+		Args:          cobra.NoArgs,
+		SilenceErrors: true,
+		RunE: func(_ *cobra.Command, _ []string) error {
+			list, err := c.Classifications.List(classListInput)
+			if err != nil {
+				return fmt.Errorf("failed listing classifications: %w", err)
+			}
 
-		return render(list)
-	},
-}
+			return render(list)
+		},
+	}
+)
 
 var (
 	classCreateInput client.CreateClassificationInput
@@ -110,6 +113,25 @@ var classDeleteCmd = &cobra.Command{
 	},
 }
 
+var classRunCmd = &cobra.Command{
+	Use:           "run CLASSIFICATION_ID",
+	Short:         "Run a classification rule against inventory",
+	Args:          cobra.ExactArgs(1),
+	SilenceErrors: true,
+	RunE: func(_ *cobra.Command, args []string) error {
+		res, err := c.Classifications.Run(args[0])
+		if err != nil {
+			return fmt.Errorf(
+				"failed running classification %q: %w",
+				args[0],
+				err,
+			)
+		}
+
+		return render(res)
+	},
+}
+
 func init() {
 	// Classification creation flags
 	classCreateCmd.PersistentFlags().StringVar(
@@ -139,6 +161,14 @@ func init() {
 		"Rego policy encoded in Base64 format (required). Use a dash ('-') to read code from standard input",
 	)
 	classCreateCmd.MarkPersistentFlagRequired("rego") // nolint: errcheck
+
+	// Classification listing flags
+	classListCmd.PersistentFlags().BoolVar(
+		&classListInput.DecodeRego,
+		"decode-rego",
+		true,
+		"Automatically decode Rego code, which is stored base64 encoded.",
+	)
 
 	// Classification modification flags
 	classUpdateCmd.PersistentFlags().StringVar(
@@ -171,6 +201,7 @@ func init() {
 		classCreateCmd,
 		classUpdateCmd,
 		classDeleteCmd,
+		classRunCmd,
 	)
 	rootCmd.AddCommand(classCmd)
 }
