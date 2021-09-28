@@ -136,7 +136,7 @@ func init() {
 		&classCreateInput.Rego,
 		"rego",
 		"",
-		"Rego policy (required). Use a dash ('-') to read code from standard input",
+		"Rego policy encoded in Base64 format (required). Use a dash ('-') to read code from standard input",
 	)
 	classCreateCmd.MarkPersistentFlagRequired("rego") // nolint: errcheck
 
@@ -163,7 +163,7 @@ func init() {
 		&classUpdateInput.Rego,
 		"rego",
 		"",
-		"Rego policy. Use a dash ('-') to read code from standard input",
+		"Rego policy encoded in Base64 format . Use a dash ('-') to read code from standard input",
 	)
 
 	classCmd.AddCommand(
