@@ -18,7 +18,7 @@ done
 ROOT=`pwd`
 
 usage() {
-    echo -e "${CYAN}Infralight CLI: CI/CD Tool${NC}"
+    echo -e "${CYAN}Firefly CLI: CI/CD Tool${NC}"
     echo "----------------------------------------"
     echo "Usage: $0 [-h] <command> [arguments]"
     echo ""
@@ -63,16 +63,16 @@ case "${COMMAND}" in
             CGO_ENABLED=0 \
             go build -a -tags netgo \
             -ldflags "-w -extldflags '-static' -X github.com/infralight/cli/version.Version=`git rev-parse --short HEAD`.`date +%y%m%d`" \
-            -o infralight \
+            -o firefly \
             main.go
         ;;
     build-mac)
             GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 \
             go build -a -tags netgo \
             -ldflags "-w -extldflags '-static' -X github.com/infralight/cli/version.Version=`git rev-parse --short HEAD`.`date +%y%m%d`" \
-            -o infralight-mac \
+            -o firefly-mac \
             main.go
-        ;;        
+        ;;
     test)
         go test ./...
         ;;

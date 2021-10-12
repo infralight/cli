@@ -5,11 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/infralight/cli/client"
 	"github.com/infralight/cli/config"
 	"github.com/infralight/cli/tui"
+	"github.com/infralight/cli/version"
 	"github.com/spf13/cobra"
 )
 
@@ -18,8 +20,8 @@ var c *client.Client
 var prettyPrint, ignoreErrors bool
 
 var rootCmd = &cobra.Command{
-	Use:   "infralight",
-	Short: "Command line interface for the Infralight SaaS",
+	Use:   strings.ToLower(version.Product),
+	Short: fmt.Sprintf("Command line interface for the %s SaaS", version.Product),
 	PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 		if cmd.Name() == "configure" || cmd.Name() == "version" {
 			return nil
@@ -103,8 +105,8 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(
 		&apiURL,
 		"url",
-		client.DefaultInfralightURL,
-		"Infralight API URL",
+		client.DefaultAPIURL,
+		fmt.Sprintf("%s API URL", version.Product),
 	)
 	rootCmd.PersistentFlags().StringVar(
 		&authHeader,

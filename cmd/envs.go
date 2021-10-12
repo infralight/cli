@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/infralight/cli/version"
 	"github.com/spf13/cobra"
 )
 
@@ -16,13 +18,13 @@ var (
 
 var envsCmd = &cobra.Command{
 	Use:   "envs [cmd]",
-	Short: "Manage Infralight Environments",
+	Short: fmt.Sprintf("Manage %s Environments", version.Product),
 	Args:  cobra.MinimumNArgs(1),
 }
 
 var envsListCmd = &cobra.Command{
 	Use:           "list",
-	Short:         "List Infralight Environments",
+	Short:         fmt.Sprintf("List %s Environments", version.Product),
 	Args:          cobra.NoArgs,
 	SilenceErrors: true,
 	RunE: func(_ *cobra.Command, _ []string) error {
@@ -37,7 +39,7 @@ var envsListCmd = &cobra.Command{
 
 var envDeleteCmd = &cobra.Command{
 	Use:           "delete --env-id ENVIRONMENT_ID",
-	Short:         "Delete Infralight Environment",
+	Short:         fmt.Sprintf("Delete %s Environment", version.Product),
 	Args:          cobra.NoArgs,
 	SilenceErrors: true,
 	RunE: func(_ *cobra.Command, args []string) error {
@@ -53,7 +55,7 @@ var envDeleteCmd = &cobra.Command{
 // nolint:lll
 var envCreateCmd = &cobra.Command{
 	Use:           "create --name ENVIRONMENT_NAME --type ENVIRONMENT_TYPE --owner ENVIRONMENT_OWNER --labels=label1,label2",
-	Short:         "Create Infralight Environment",
+	Short:         fmt.Sprintf("Create %s Environment", version.Product),
 	Args:          cobra.NoArgs,
 	SilenceErrors: true,
 	RunE: func(_ *cobra.Command, args []string) error {
@@ -71,7 +73,7 @@ func init() {
 	envCreateCmd.PersistentFlags().StringVar(&environmentCreateName, "name", "", "Environment Name")
 	envCreateCmd.MarkPersistentFlagRequired("name")
 	envCreateCmd.PersistentFlags().StringVar(&environmentCreateType, "type", "iacStack", "Environment Type")
-	envCreateCmd.PersistentFlags().StringVar(&environmentCreateOwner, "owner", "InfralightCli", "Environment owner. Use infralight users list to see available options")
+	envCreateCmd.PersistentFlags().StringVar(&environmentCreateOwner, "owner", fmt.Sprintf("%sCli", version.Product), fmt.Sprintf("Environment owner. Use `%s users list` to see available options", strings.ToLower(version.Product)))
 	envCreateCmd.MarkPersistentFlagRequired("owner")
 	envCreateCmd.PersistentFlags().StringSliceVar(&environmentCreateLabels, "labels", nil, "Environment labels.")
 	envDeleteCmd.PersistentFlags().StringVar(&environmentDeleteId, "env-id", "", "The environment id to list the stacks for")
