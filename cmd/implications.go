@@ -59,7 +59,7 @@ func getIdsFromPlan(path string) ([]client.ResourceDetails, error) {
 	if err != nil {
 		return resources, err
 	}
-	defer f.Close()
+	defer f.Close() // nolint: errcheck
 
 	var plan *tfjson.Plan
 	err = json.NewDecoder(f).Decode(&plan)
