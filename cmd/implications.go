@@ -21,7 +21,7 @@ var implicationsCmd = &cobra.Command{
 	Use:   "implications [cmd]",
 	Short: "implications",
 	Args:  cobra.NoArgs,
-	RunE: func(_ *cobra.Command, _ []string) error {
+	RunE: func(_ *cobra.Command, args []string) error {
 		var count = 0
 
 		resources, err := getIdsFromPlan(planFile)
@@ -29,8 +29,8 @@ var implicationsCmd = &cobra.Command{
 			return err
 		}
 
-		for index, _ := range resources {
-			input, err := c.Inventory.NewSearchInput(resources[index].ARN)
+		for index, resource := range resources {
+			input, err := c.Inventory.NewSearchInput(resource.ARN)
 			if err != nil {
 				return err
 			}
