@@ -31,6 +31,7 @@ type baseClient struct {
 type Client struct {
 	Dragonfly       *DragonflyClient
 	Classifications *ClassificationsClient
+	Inventory       *InventoryClient
 	*baseClient
 }
 
@@ -68,6 +69,7 @@ func New(url, authHeader string) *Client {
 
 	return &Client{
 		baseClient:      base,
+		Inventory:       &InventoryClient{base},
 		Dragonfly:       &DragonflyClient{base},
 		Classifications: &ClassificationsClient{base},
 	}
