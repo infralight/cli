@@ -53,7 +53,7 @@ var implicationsCmd = &cobra.Command{
 }
 
 func getIdsFromPlan(path string) ([]client.ResourceDetails, error) {
-	var resources []client.ResourceDetails
+	resources := make([]client.ResourceDetails, 0)
 
 	f, err := os.Open(path)
 	if err != nil {
