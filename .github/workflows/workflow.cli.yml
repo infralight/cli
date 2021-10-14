@@ -45,7 +45,7 @@ jobs:
     - name: Upload files
       uses: jakejarvis/s3-sync-action@master
       with:
-        args: --acl public-read --follow-symlinks --exclude='*' --include='infralight*'
+        args: --acl public-read --follow-symlinks --exclude='*' --include='flycli*'
       env:
         DEST_DIR: 'files/cli'
         AWS_S3_BUCKET: ${{ secrets[env.DASHBOARD_AWS_S3_BUCKET_VAR_NAME] }}
