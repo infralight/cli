@@ -6,6 +6,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/infralight/cli/client"
+	"github.com/infralight/cli/version"
 )
 
 var (
@@ -26,7 +27,7 @@ func NewHomeTab(_ *client.Client) *HomeTab {
 }
 
 func (m *HomeTab) Key() string                 { return "0" }
-func (m *HomeTab) Name() string                { return "Infralight" }
+func (m *HomeTab) Name() string                { return version.Product }
 func (m *HomeTab) NormalStyle() lipgloss.Style { return homeTabStyle }
 func (m *HomeTab) ActiveStyle() lipgloss.Style { return homeTabStyle }
 
@@ -60,9 +61,9 @@ func (m *HomeTab) View() string {
 				Width(50).
 				Height(3).
 				Align(lipgloss.Center).
-				Render(`Welcome to the Infralight CLI!
+				Render(fmt.Sprintf(`Welcome to the %s CLI!
 Select a tab from the above menu by
-pressing the appropriate keyboard shortcut`),
+pressing the appropriate keyboard shortcut`, version.Product)),
 			lipgloss.WithWhitespaceChars("※"),
 			lipgloss.WithWhitespaceForeground(subtle),
 		),

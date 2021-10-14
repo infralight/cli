@@ -4,8 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/adrg/xdg"
+	"github.com/infralight/cli/version"
 	"github.com/pelletier/go-toml/v2"
 )
 
@@ -22,8 +24,22 @@ var (
 )
 
 func LoadConfig(profile string) (c Config, err error) {
+	c, err = loadProductConfig(version.Product, profile)
+	if err != nil {
+		// try to load configuration from the old product name
+		var oldErr error
+		c, oldErr = loadProductConfig(version.OldProduct, profile)
+		if oldErr != nil {
+			return c, err
+		}
+	}
+
+	return c, nil
+}
+
+func loadProductConfig(product, profile string) (c Config, err error) {
 	path, err := xdg.SearchConfigFile(
-		fmt.Sprintf("infralight/%s.toml", profile),
+		fmt.Sprintf("%s/%s.toml", strings.ToLower(product), profile),
 	)
 	if err != nil {
 		return c, ErrConfigNotFound
@@ -50,7 +66,7 @@ func LoadConfig(profile string) (c Config, err error) {
 
 func (c Config) Save() (path string, err error) {
 	path, err = xdg.ConfigFile(
-		fmt.Sprintf("infralight/%s.toml", c.Profile),
+		fmt.Sprintf("%s/%s.toml", strings.ToLower(version.Product), c.Profile),
 	)
 	if err != nil {
 		return path, fmt.Errorf(

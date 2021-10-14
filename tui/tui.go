@@ -8,6 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/infralight/cli/client"
+	"github.com/infralight/cli/version"
 	"golang.org/x/term"
 )
 
@@ -99,7 +100,7 @@ func (m *Model) View() string {
 
 	if !m.signIn.isSignedIn {
 		// User is not signed in, render the Sign In component
-		fmt.Fprintf(&b, "%s\n\n", headerStyle.Render("Infralight CLI"))
+		fmt.Fprintf(&b, "%s\n\n", headerStyle.Render(fmt.Sprintf("%s CLI", version.Product)))
 		b.WriteString(m.signIn.View())
 		return b.String()
 	}

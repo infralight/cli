@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/infralight/cli/client"
+	"github.com/infralight/cli/version"
 	"github.com/spf13/cobra"
 )
 
@@ -312,8 +313,8 @@ func init() { // nolint: funlen
 	pipelineCreateCmd.PersistentFlags().StringVar(
 		&pipelineCreateInput.Owner,
 		"owner",
-		"InfralightCli",
-		"Pipeline owner. Use infralight users list to see available options",
+		fmt.Sprintf("%sCli", version.Product),
+		fmt.Sprintf("Pipeline owner. Use `%s users list` to see available options", version.Product),
 	)
 	pipelineCreateCmd.PersistentFlags().StringSliceVar(
 		&pipelineCreateInput.Labels, "labels", nil, "Pipeline labels",
@@ -327,8 +328,8 @@ func init() { // nolint: funlen
 	pipelineUpdateCmd.PersistentFlags().StringVar(
 		&pipelineUpdateInput.Owner,
 		"owner",
-		"InfralightCli",
-		"Pipeline owner. Use infralight users list to see available options",
+		fmt.Sprintf("%sCli", version.Product),
+		fmt.Sprintf("Pipeline owner. Use `%s users list` to see available options", version.Product),
 	)
 	pipelineUpdateCmd.PersistentFlags().BoolVar(
 		&pipelineUpdateInput.IsTerragrunt,

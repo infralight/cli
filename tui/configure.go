@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/infralight/cli/client"
 	"github.com/infralight/cli/config"
+	"github.com/infralight/cli/version"
 )
 
 type ConfigureModel struct {
@@ -39,8 +40,9 @@ func StartConfigure(showMessage string) (profile string, err error) {
 
 	urlInput := textinput.NewModel()
 	urlInput.Placeholder = fmt.Sprintf(
-		"Infralight URL [%s]",
-		client.DefaultInfralightURL,
+		"%s URL [%s]",
+		version.Product,
+		client.DefaultAPIURL,
 	)
 	urlInput.PromptStyle = purpleText
 	urlInput.TextStyle = purpleText
@@ -183,7 +185,7 @@ func (m *ConfigureModel) writeConfig() tea.Msg {
 		c.Profile = "default"
 	}
 	if c.URL == "" {
-		c.URL = client.DefaultInfralightURL
+		c.URL = client.DefaultAPIURL
 	}
 	if c.AuthorizationHeader == "" {
 		c.AuthorizationHeader = client.DefaultAuthHeader

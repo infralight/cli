@@ -19,8 +19,8 @@ import (
 )
 
 const (
-	DefaultInfralightURL = "https://prodapi.infralight.cloud/api"
-	DefaultAuthHeader    = "Authorization"
+	DefaultAPIURL     = "https://prodapi.infralight.cloud/api"
+	DefaultAuthHeader = "Authorization"
 )
 
 type baseClient struct {
@@ -37,7 +37,7 @@ type Client struct {
 
 func New(url, authHeader string) *Client {
 	if url == "" {
-		url = DefaultInfralightURL
+		url = DefaultAPIURL
 	}
 	if authHeader == "" {
 		authHeader = DefaultAuthHeader

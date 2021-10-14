@@ -86,7 +86,7 @@ func (m *SignInModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			// Did the user press enter while the submit button was focused?
 			if s == KeyEnter && m.index == len(m.inputs) {
-				// Sign-in to the Infralight App Server
+				// Sign-in to the App Server
 				m.isLoading = true
 				return m, m.signIn
 			}

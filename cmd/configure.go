@@ -5,12 +5,13 @@ import (
 	"os"
 
 	"github.com/infralight/cli/tui"
+	"github.com/infralight/cli/version"
 	"github.com/spf13/cobra"
 )
 
 var configureCmd = &cobra.Command{
 	Use:   "configure",
-	Short: "Configure Infralight authentication",
+	Short: fmt.Sprintf("Configure %s authentication", version.Product),
 	Args:  cobra.NoArgs,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		profile, err := tui.StartConfigure("")

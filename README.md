@@ -1,26 +1,26 @@
-# ![Infralight Logo](project-logo.png)
+# ![Firefly Logo](project-logo.png)
 
-**Infralight Command Line Interface, Terminal User Interface and Client Library**
+**Firefly Command Line Interface, Terminal User Interface and Client Library**
 
 <!-- vim-markdown-toc GFM -->
 
-* [Overview](#overview)
-* [Features](#features)
-* [Installation](#installation)
-* [Quick Start](#quick-start)
-    * [Example 1: Create a Configuration Profile](#example-1-create-a-configuration-profile)
-    * [Example 2: Start the TUI](#example-2-start-the-tui)
-    * [Example 3: List Available Environments](#example-3-list-available-environments)
-* [Development](#development)
-    * [Requirements](#requirements)
-    * [Available Tasks](#available-tasks)
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+  - [Example 1: Create a Configuration Profile](#example-1-create-a-configuration-profile)
+  - [Example 2: Start the TUI](#example-2-start-the-tui)
+  - [Example 3: List Available Environments](#example-3-list-available-environments)
+- [Development](#development)
+  - [Requirements](#requirements)
+  - [Available Tasks](#available-tasks)
 
 <!-- vim-markdown-toc -->
 
 ## Overview
 
 This repository contains a CLI, TUI and client library for the
-[Infralight SaaS](https://infralight.co). Customers can use it to automate Infralight
+[Firefly SaaS](https://infralight.co). Customers can use it to automate Firefly
 operations in CI systems; manually execute such operations via the command line;
 or integrate the client library into the customer's applications.
 
@@ -31,10 +31,10 @@ executable.
 
 ## Features
 
-- Beautiful view-only TUI to fetch information from the Infralight API. Only a
-  subset of the features provided by the Infralight Dashboard are also included
+- Beautiful view-only TUI to fetch information from the Firefly API. Only a
+  subset of the features provided by the Firefly Dashboard are also included
   in the TUI.
-- Comprehensive suite of CI-friendly commands to access the Infralight API.
+- Comprehensive suite of CI-friendly commands to access the Firefly API.
 - Go client library for integration with customer applications.
 
 ## Installation
@@ -45,21 +45,21 @@ TODO: once published, modify instructions to download the executable.
 go clone git@github.com:infralight/cli.git
 cd cli
 ./task build
-sudo install -Dm755 infralight /usr/local/bin/infralight
+sudo install flycli /usr/local/bin/flycli
 ```
 
 ## Quick Start
 
 ```sh
-infralight --help
+firefly --help
 ```
 
-The CLI needs an access and secret key-pair to authenticate with the Infralight
-API server. A keypair must be created through the Infralight dashboard.
+The CLI needs an access and secret key-pair to authenticate with the Firefly
+API server. A keypair must be created through the Firefly dashboard.
 
 Multiple profiles can be created, each with its own key-pair and a few more
 optional settings, such as the ability to override the API URL and name of the
-Authorization header (useful when organizational access to Infralight is behind
+Authorization header (useful when organizational access to Firefly is behind
 a reverse proxy). The default profile is called "default". Select a profile by
 using the `--profile` or `-p` command line flag.
 
@@ -76,7 +76,7 @@ If no command is provided, the program will start the Terminal User Interface.
 ### Example 1: Create a Configuration Profile
 
 ```sh
-infralight configure
+firefly configure
 ```
 
 Fill in the required information, including a name for the profile and the
@@ -86,13 +86,13 @@ access/secret key-pair. A TOML configuration file will be created in the user's
 ### Example 2: Start the TUI
 
 ```sh
-infralight
+firefly
 ```
 
 ### Example 3: List Available Environments
 
 ```sh
-infralight envs list
+firefly envs list
 ```
 
 By default, output is one-lined JSON. To pretty print, add the `--pretty` flag.
@@ -104,8 +104,8 @@ execute common tasks such as compiling the CLI and running tests.
 
 ### Requirements
 
-* [Go](https://golang.org/) v1.16+
-* [golangci-lint](https://golangci-lint.run/) v1.35+
+- [Go](https://golang.org/) v1.16+
+- [golangci-lint](https://golangci-lint.run/) v1.35+
 
 ### Available Tasks
 
