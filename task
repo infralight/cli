@@ -63,14 +63,14 @@ case "${COMMAND}" in
             CGO_ENABLED=0 \
             go build -a -tags netgo \
             -ldflags "-w -extldflags '-static' -X github.com/infralight/cli/version.Version=`git rev-parse --short HEAD`.`date +%y%m%d`" \
-            -o firefly \
+            -o flycli \
             main.go
         ;;
     build-mac)
             GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 \
             go build -a -tags netgo \
             -ldflags "-w -extldflags '-static' -X github.com/infralight/cli/version.Version=`git rev-parse --short HEAD`.`date +%y%m%d`" \
-            -o firefly-mac \
+            -o flycli-mac \
             main.go
         ;;
     test)

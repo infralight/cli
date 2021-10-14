@@ -45,7 +45,7 @@ TODO: once published, modify instructions to download the executable.
 go clone git@github.com:infralight/cli.git
 cd cli
 ./task build
-sudo install -Dm755 firefly /usr/local/bin/firefly
+sudo install flycli /usr/local/bin/flycli
 ```
 
 ## Quick Start

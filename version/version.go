@@ -1,7 +1,7 @@
 package version
 
 const (
-	Product    = "Firefly"
+	Product    = "FlyCLI"
 	OldProduct = "Infralight"
 )
 
