@@ -7,6 +7,8 @@
 - [Overview](#overview)
 - [Features](#features)
 - [Installation](#installation)
+  - [Via Homebrew](#via-homebrew)
+  - [Binary Download](#binary-download)
 - [Quick Start](#quick-start)
   - [Example 1: Create a Configuration Profile](#example-1-create-a-configuration-profile)
   - [Example 2: Start the TUI](#example-2-start-the-tui)
@@ -39,14 +41,16 @@ executable.
 
 ## Installation
 
-TODO: once published, modify instructions to download the executable.
+### Via Homebrew
 
-```sh
-go clone git@github.com:infralight/cli.git
-cd cli
-./task build
-sudo install flycli /usr/local/bin/flycli
-```
+`brew install infralight/firefly/flycli`
+
+Or `brew tap infralight/firefly` and then `brew install flycli`.
+
+### Binary Download
+
+- [Linux binary executable](https://app.infralight.cloud/files/cli/flycli)
+- [MacOS binary executable](https://app.infralight.cloud/files/cli/flycli-mac)
 
 ## Quick Start
 
