@@ -23,6 +23,7 @@ type Resource struct {
 	AssetType     string `json:"assetType"`
 	Region        string `json:"region"`
 	EnvironmentID string `json:"environmentId"`
+	InventoryItem string `json:"inventoryItem"`
 	IacType       string `json:"iacType"`
 }
 
