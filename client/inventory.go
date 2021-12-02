@@ -52,35 +52,9 @@ func (c *InventoryClient) NewSearchInput(query string) (map[string]interface{}, 
   "queryAdditionalFilters": [],
   "queryAdditionalFilterOut": [],
   "aggregations": {
-    "is_managed_by_env": {
-      "terms": {
-        "field": "state.keyword",
-        "size": 10000
-      },
-      "aggs": {
-        "environment": {
-          "terms": {
-            "field": "environmentId.keyword",
-            "size": 10000
-          }
-        }
-      }
-    },
-    "ismanaged": {
-      "terms": {
-        "field": "state.keyword",
-        "size": 10000
-      }
-    },
     "assetType": {
       "terms": {
         "field": "assetType.keyword",
-        "size": 10000
-      }
-    },
-    "environment": {
-      "terms": {
-        "field": "environmentId.keyword",
         "size": 10000
       }
     },
@@ -131,7 +105,7 @@ func (c *InventoryClient) NewSearchInput(query string) (map[string]interface{}, 
 }
 
 func (c *InventoryClient) SearchInventory(input map[string]interface{}) (result InventorySearchResult, err error) {
-	err = c.httpc.NewRequest("POST", "/inventoryV2").
+	err = c.httpc.NewRequest("POST", "/inventoryV2/data").
 		JSONBody(input).
 		Into(&result).
 		Run()
