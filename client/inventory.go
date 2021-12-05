@@ -28,6 +28,7 @@ type Resource struct {
 
 type ResourceDetails struct {
 	ARN               string     `json:"arn,omitempty"`
+	ID                string     `json:"id,omitempty"`
 	Name              string     `json:"name,omitempty"`
 	Type              string     `json:"type,omitempty"`
 	ModuleAddress     string     `json:"module_address,omitempty"`
