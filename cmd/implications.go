@@ -30,7 +30,7 @@ var implicationsCmd = &cobra.Command{
 		}
 
 		for index, resource := range resources {
-			input, err := c.Inventory.NewSearchInput(resource.ARN)
+			input, err := c.Inventory.NewSearchInput(resource.ID)
 			if err != nil {
 				return err
 			}
@@ -84,12 +84,13 @@ func getIdsFromPlan(path string) ([]client.ResourceDetails, error) {
 			continue
 		}
 
-		arn := getArnFromChange(item.Change.Before)
-		if arn == "" {
+		arn, id := getArnAndIdFromChange(item.Change.Before)
+		if id == "" {
 			continue
 		}
 		resources = append(resources, client.ResourceDetails{
 			ARN:               arn,
+			ID:                id,
 			Name:              item.Name,
 			Type:              item.Type,
 			ModuleAddress:     item.ModuleAddress,
@@ -102,8 +103,10 @@ func getIdsFromPlan(path string) ([]client.ResourceDetails, error) {
 	return resources, nil
 }
 
-func getArnFromChange(in interface{}) string {
+func getArnAndIdFromChange(in interface{}) (string, string) {
 	v := reflect.ValueOf(in)
+	arn := ""
+	id := ""
 
 	if v.Kind() == reflect.Map {
 		for _, key := range v.MapKeys() {
@@ -111,13 +114,17 @@ func getArnFromChange(in interface{}) string {
 
 			if key.Kind() == reflect.String {
 				if key.String() == "arn" {
-					return fmt.Sprintf("%v", attribute.Interface())
+					arn = fmt.Sprintf("%v", attribute.Interface())
+				}
+
+				if key.String() == "id" {
+					id = fmt.Sprintf("%v", attribute.Interface())
 				}
 			}
 		}
 	}
 
-	return ""
+	return arn, id
 }
 
 func init() {
