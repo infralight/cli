@@ -40,8 +40,15 @@ var implicationsCmd = &cobra.Command{
 				return fmt.Errorf("failed to search in the inventory, error: %w", err)
 			}
 
-			count += result.TotalObjects
-			resources[index].EffectedResources = result.ResponseObjects
+			for _, responseObj := range result.ResponseObjects {
+				if responseObj.AssetID == resource.ARN {
+					continue
+				}
+
+				count += 1
+				resources[index].EffectedResources = append(resources[index].EffectedResources, responseObj)
+			}
+
 		}
 
 		return render(client.Implication{
