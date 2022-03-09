@@ -214,11 +214,13 @@ func (c *Client) DeleteStack(envID, stackID string) (stack map[string]interface{
 	return stack, err
 }
 
-func (c *Client) Codify(assetType, assetID string) (output string, err error) {
+func (c *Client) Codify(provider, providerId, assetType, assetID string) (output string, err error) {
 	err = c.httpc.NewRequest("POST", "/reverseLearning").
 		JSONBody(map[string]string{
-			"assetType": assetType,
-			"assetId":   assetID,
+			"assetType":  assetType,
+			"assetId":    assetID,
+			"providerId": providerId,
+			"provider":   provider,
 		}).
 		BodyHandler(func(_ int, contentType string, body io.Reader, target interface{}) error {
 			b, err := io.ReadAll(body)

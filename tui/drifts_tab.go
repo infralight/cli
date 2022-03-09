@@ -240,6 +240,7 @@ func (m *DriftsTab) codify() tea.Msg {
 	code, err := m.c.Codify(
 		m.currentAsset.Type,
 		fmt.Sprintf("%s:%s", m.currentAsset.AccountID, m.currentAsset.ID),
+		"", "",
 	)
 	if err != nil {
 		return errMsg{err}
