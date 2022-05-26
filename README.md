@@ -55,7 +55,7 @@ Or `brew tap infralight/firefly` and then `brew install flycli`.
 ## Quick Start
 
 ```sh
-firefly --help
+flycli --help
 ```
 
 The CLI needs an access and secret key-pair to authenticate with the Firefly
@@ -80,7 +80,7 @@ If no command is provided, the program will start the Terminal User Interface.
 ### Example 1: Create a Configuration Profile
 
 ```sh
-firefly configure
+flycli configure
 ```
 
 Fill in the required information, including a name for the profile and the
@@ -90,13 +90,13 @@ access/secret key-pair. A TOML configuration file will be created in the user's
 ### Example 2: Start the TUI
 
 ```sh
-firefly
+flycli
 ```
 
 ### Example 3: List Available Environments
 
 ```sh
-firefly envs list
+flycli envs list
 ```
 
 By default, output is one-lined JSON. To pretty print, add the `--pretty` flag.
