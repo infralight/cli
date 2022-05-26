@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/ido50/requests"
+
 	"github.com/infralight/cli/config"
 )
 
