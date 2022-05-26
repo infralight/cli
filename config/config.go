@@ -11,6 +11,7 @@ import (
 	"github.com/pelletier/go-toml/v2"
 )
 
+
 const (
     DefaultAPIURL     = "https://prodapi.gofirefly.io/api"
     DefaultAuthHeader = "Authorization"
