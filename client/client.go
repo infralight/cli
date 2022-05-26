@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	DefaultAPIURL     = "https://prodapi.infralight.cloud/api"
+	DefaultAPIURL     = "https://prodapi.gofirefly.io/api"
 	DefaultAuthHeader = "Authorization"
 )
 
