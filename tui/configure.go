@@ -1,14 +1,14 @@
 package tui
 
 import (
-    "errors"
-    "fmt"
-    "strings"
+	"errors"
+	"fmt"
+	"strings"
 
-    "github.com/charmbracelet/bubbles/textinput"
-    tea "github.com/charmbracelet/bubbletea"
-    "github.com/infralight/cli/config"
-    "github.com/infralight/cli/version"
+	"github.com/charmbracelet/bubbles/textinput"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/infralight/cli/config"
+	"github.com/infralight/cli/version"
 )
 
 type ConfigureModel struct {
