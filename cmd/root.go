@@ -105,13 +105,13 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(
 		&apiURL,
 		"url",
-		client.DefaultAPIURL,
+		config.DefaultAPIURL,
 		fmt.Sprintf("%s API URL", version.Product),
 	)
 	rootCmd.PersistentFlags().StringVar(
 		&authHeader,
 		"auth-header",
-		client.DefaultAuthHeader,
+		config.DefaultAuthHeader,
 		"Authorization header",
 	)
 	rootCmd.PersistentFlags().BoolVar(

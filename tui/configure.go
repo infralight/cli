@@ -7,7 +7,6 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/infralight/cli/client"
 	"github.com/infralight/cli/config"
 	"github.com/infralight/cli/version"
 )
@@ -42,7 +41,7 @@ func StartConfigure(showMessage string) (profile string, err error) {
 	urlInput.Placeholder = fmt.Sprintf(
 		"%s URL [%s]",
 		version.Product,
-		client.DefaultAPIURL,
+		config.DefaultAPIURL,
 	)
 	urlInput.PromptStyle = purpleText
 	urlInput.TextStyle = purpleText
@@ -50,7 +49,7 @@ func StartConfigure(showMessage string) (profile string, err error) {
 	authHeaderInput := textinput.NewModel()
 	authHeaderInput.Placeholder = fmt.Sprintf(
 		"Authorization Header [%s]",
-		client.DefaultAuthHeader,
+		config.DefaultAuthHeader,
 	)
 	authHeaderInput.PromptStyle = purpleText
 	authHeaderInput.TextStyle = purpleText
@@ -185,10 +184,10 @@ func (m *ConfigureModel) writeConfig() tea.Msg {
 		c.Profile = "default"
 	}
 	if c.URL == "" {
-		c.URL = client.DefaultAPIURL
+		c.URL = config.DefaultAPIURL
 	}
 	if c.AuthorizationHeader == "" {
-		c.AuthorizationHeader = client.DefaultAuthHeader
+		c.AuthorizationHeader = config.DefaultAuthHeader
 	}
 	if c.AccessKey == "" {
 		return errMsg{errors.New("Access key must be provided")}

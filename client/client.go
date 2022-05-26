@@ -16,11 +16,8 @@ import (
 	"time"
 
 	"github.com/ido50/requests"
-)
 
-const (
-	DefaultAPIURL     = "https://prodapi.gofirefly.io/api"
-	DefaultAuthHeader = "Authorization"
+	"github.com/infralight/cli/config"
 )
 
 type baseClient struct {
@@ -37,10 +34,10 @@ type Client struct {
 
 func New(url, authHeader string) *Client {
 	if url == "" {
-		url = DefaultAPIURL
+		url = config.DefaultAPIURL
 	}
 	if authHeader == "" {
-		authHeader = DefaultAuthHeader
+		authHeader = config.DefaultAuthHeader
 	}
 
 	base := &baseClient{

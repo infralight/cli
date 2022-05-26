@@ -11,6 +11,12 @@ import (
 	"github.com/pelletier/go-toml/v2"
 )
 
+const (
+	DefaultAPIURL     = "https://prodapi.gofirefly.io/api"
+	DefaultAuthHeader = "Authorization"
+	oldApiUrl         = "https://prodapi.infralight.cloud/api"
+)
+
 type Config struct {
 	Profile             string
 	URL                 string
@@ -59,6 +65,10 @@ func loadProductConfig(product, profile string) (c Config, err error) {
 			"failed parsing config file %s: %w",
 			path, err,
 		)
+	}
+
+	if c.URL == oldApiUrl {
+		c.URL = DefaultAPIURL
 	}
 
 	return c, nil
